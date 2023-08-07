@@ -23,13 +23,19 @@ mrkt = Market()
 
 
 class newWindow(QWidget):
-    def __init__(self):
+    def __init__(self, row_data):
         super().__init__()
-        layout = QVBoxLayout()
-        self.label = QLabel("New Label")
-        layout.addWidget(self.label)
-        self.setLayout(layout)
 
+        self.layout = QVBoxLayout()
+
+        self.tableWidget = QTableWidget()
+        self.tableWidget.setColumnCount(len(row_data))
+        self.tableWidget.setRowCount(1)
+        for col, data in enumerate(row_data):
+            self.tableWidget.setItem(0, col, QTableWidgetItem(data))
+
+        self.layout.addWidget(self.tableWidget)
+        self.setLayout(self.layout)
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -61,25 +67,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        def cell_double_clicked(row, column):
-            pass
+        def cell_double_clicked(item):
+            row_data = [self.tableWidget.item(item.row(), col).text() for col in range(self.tableWidget.columnCount())]
+            new_window(row_data)
 
-        def new_window(row, column):
-            self.description_window = newWindow()
+        def new_window(row_data):
+            self.description_window = newWindow(row_data)
             self.description_window.resize(400, 400)
+            self.description_window.setWindowTitle("Row Data")
             self.description_window.show()
 
-
-        self.tableWidget.itemDoubleClicked.connect(new_window)
-
-        #self.tableWidget.activated.connect(new_window)
-
-
-
-
-
-
-
+        self.tableWidget.itemDoubleClicked.connect(cell_double_clicked)
 
         #self.tableWidget.activated.connect(new_window())
 
