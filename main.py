@@ -13,6 +13,82 @@ from yahoostock import *
 from sklearn.linear_model import LinearRegression
 from vectorized import *
 from market import *
+from u import *
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import  QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView
+from PyQt5 import uic
+import sys
+
+mrkt = Market()
+
+
+class newWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        layout = QVBoxLayout()
+        self.label = QLabel("New Label")
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+
+
+
+class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QMainWindow.__init__(self, parent=parent)
+        self.setupUi(self)
+        self.btnMarket.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_1))
+        self.btnPortfolio.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_2))
+
+        self.tableWidget.setColumnWidth(0, 80)
+        self.tableWidget.setColumnWidth(1, 315)
+        self.tableWidget.setColumnWidth(2, 250)
+        self.tableWidget.setColumnWidth(3, 80)
+        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.sec_count = 0
+
+        self.description_window = QWidget()
+
+        for asset in mrkt.allAssets():
+            print(asset.getTicket(), asset.getName())
+            rowPos = self.tableWidget.rowCount()
+            self.tableWidget.insertRow(rowPos)
+            self.tableWidget.setItem(self.sec_count, 0, QTableWidgetItem(asset.getTicket()))
+            self.tableWidget.setItem(self.sec_count, 1, QTableWidgetItem(asset.getName()))
+            self.tableWidget.setItem(self.sec_count, 2, QTableWidgetItem("DESCRIPTION"))
+            self.tableWidget.setItem(self.sec_count, 3, QTableWidgetItem(str(asset.getPrice())))
+            self.sec_count += 1
+
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        def cell_double_clicked(row, column):
+            pass
+
+        def new_window(row, column):
+            self.description_window = newWindow()
+            self.description_window.resize(400, 400)
+            self.description_window.show()
+
+
+        self.tableWidget.itemDoubleClicked.connect(new_window)
+
+        #self.tableWidget.activated.connect(new_window)
+
+
+
+
+
+
+
+
+        #self.tableWidget.activated.connect(new_window())
+
+
+        #self.tableWidget.activated.connect()
+
+
+
+
 
 if __name__ == "__main__":
     #stock1 = Stock("test stock1", 1234.34, 20)
@@ -424,25 +500,31 @@ if __name__ == "__main__":
     plt.show()
     """
 
-    mrkt = Market()
+    #mrkt.printMarket()
 
-    print("Hello!")
-    mrkt.printMarket()
+    #portfolio = PortfolioImpl()
 
-    portfolio = PortfolioImpl()
-
-    for asset in mrkt.allAssets():
-        portfolio.addSecurity(asset)
+    #for asset in mrkt.allAssets():
+    #    portfolio.addSecurity(asset)
 
     # WORKS
     #portfolio.printSecurities()
 
     # ('GOOG', 'MSFT', 'PYPL', 'QCOM', 'U')
 
-    portfolio.getStock('GOOG').setQuantity(23)
-    portfolio.getStock('MSFT').setQuantity(54)
-    portfolio.getStock('PYPL').setQuantity(60)
-    portfolio.getStock('QCOM').setQuantity(11)
-    portfolio.getStock('U').setQuantity(37)
+    #portfolio.getStock('GOOG').setQuantity(23)
+    #portfolio.getStock('MSFT').setQuantity(54)
+    #portfolio.getStock('PYPL').setQuantity(60)
+    #portfolio.getStock('QCOM').setQuantity(11)
+    #portfolio.getStock('U').setQuantity(37)
 
-    print(portfolio.weighting())
+    #print(portfolio.weighting())
+
+    mrkt.printMarket()
+
+    app = QtWidgets.QApplication(sys.argv)
+
+    window = Ui_MainWindow()#uic.loadUi('u.ui')
+    MainWindow = MainWindow()
+    MainWindow.show()
+    sys.exit(app.exec_())
