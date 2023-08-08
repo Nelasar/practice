@@ -109,16 +109,6 @@
         </widget>
        </widget>
        <widget class="QWidget" name="page_2">
-        <widget class="QTableWidget" name="tableWidget_2">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>40</y>
-           <width>731</width>
-           <height>501</height>
-          </rect>
-         </property>
-        </widget>
         <widget class="QLabel" name="label_2">
          <property name="geometry">
           <rect>
@@ -135,6 +125,44 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
+        <widget class="QTableWidget" name="tableWidget_3">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>40</y>
+           <width>731</width>
+           <height>501</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QHeaderView{
+	color: blue;
+}</string>
+         </property>
+         <column>
+          <property name="text">
+           <string>ТИКЕР</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>НАЗВАНИЕ</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignLeading|AlignVCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ОПИСАНИЕ</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ЦЕНА</string>
+          </property>
+         </column>
+        </widget>
        </widget>
       </widget>
      </item>
@@ -147,7 +175,7 @@
      <x>0</x>
      <y>0</y>
      <width>1105</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

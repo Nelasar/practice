@@ -50,6 +50,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableWidget.setColumnWidth(2, 250)
         self.tableWidget.setColumnWidth(3, 80)
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableWidget_3.setColumnWidth(0, 80)
+        self.tableWidget_3.setColumnWidth(1, 315)
+        self.tableWidget_3.setColumnWidth(2, 250)
+        self.tableWidget_3.setColumnWidth(3, 80)
+        self.tableWidget_3.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.sec_count = 0
 
         self.description_window = QWidget()
@@ -64,9 +69,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tableWidget.setItem(self.sec_count, 3, QTableWidgetItem(str(asset.getPrice())))
             self.sec_count += 1
 
+        for asset in mrkt.allAssets():
+            print(asset.getTicket(), asset.getName())
+            rowPos = self.tableWidget_3.rowCount()
+            self.tableWidget_3.insertRow(rowPos)
+            self.tableWidget_3.setItem(self.sec_count, 0, QTableWidgetItem(asset.getTicket()))
+            self.tableWidget_3.setItem(self.sec_count, 1, QTableWidgetItem(asset.getName()))
+            self.tableWidget_3.setItem(self.sec_count, 2, QTableWidgetItem("DESCRIPTION"))
+            self.tableWidget_3.setItem(self.sec_count, 3, QTableWidgetItem(str(asset.getPrice())))
+            self.sec_count += 1
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
-
+        self.tableWidget_3.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget_3.setSelectionMode(QAbstractItemView.SingleSelection)
         def cell_double_clicked(item):
             row_data = [self.tableWidget.item(item.row(), col).text() for col in range(self.tableWidget.columnCount())]
             new_window(row_data)
