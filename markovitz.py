@@ -5,104 +5,278 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 plt.rc('axes', axisbelow=True)
+class MarkovitzAnalyzer:
+    def __init__(self):
+        self.tickets = []
+        self.assets = pd.DataFrame()
+        self.num_portfolios = 10000
+        self.risk_free_rate = 0.0
+        self.num_periods_annually = 252
 
-stocks = ['A', 'B', 'C', 'D']
+        self.start = ''
+        self.end = ''
 
-n_assets = 4
-n_obs = 1000
+        self.returns = pd.DataFrame()
+        self.mean_returns = pd.DataFrame()
+        self.cov_matrix = pd.DataFrame()
 
-return_vec = np.random.randn(n_assets, n_obs)
-assets = np.array([return_vec[i].cumsum() + 1000 for i in range(len(return_vec))]).T
+    def getAssetsCount(self):
+        return len(self.tickets)
 
-table = pd.DataFrame(assets, columns=stocks)
+    def addTicketName(self, ticket):
+        self.tickets.append(ticket)
 
-#returns = table.pct_change()
-#mean_returns = returns.mean()
-#cov_matrix = returns.cov()
+    def check(self, ticket):
+        for t in self.tickets:
+            if t == ticket: return True
+        return False
+    def addAsset(self, asset):
+        self.assets[asset.getTicket()] = asset.getPriceHistory()
+        self.tickets.append(asset.getTicket())
+        print("TICKETS:", self.tickets)
+        # print(self.assets.columns)
+        # self.assets = self.assets.loc['2022-01-01':'2023-01-01']
+        # self.assets = np.append(self.assets, asset)
+        # self.assets = self.assets.dropna()
 
-num_portfolios = 10000 #25000 # Кол-во расчитываемых портфелей (итераций)
-risk_free_rate = 0.00 # Безрисковая процентная ставка
-num_periods_annually =  252 #1 #252 # Количество операционных дней в году
+    def printTickets(self):
+        print(self.tickets)
 
-def portfolio_annualised_performance(weights, mean_returns, cov_matrix):
-    returns = np.sum(mean_returns*weights) * num_periods_annually
-    std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(num_periods_annually)
+    def print(self):
+        print(self.assets)
 
-    return std, returns
+    def getAsset(self, ticket):
+        for asset in self.assets:
+            if asset.getTicket() == ticket:
+                return asset
 
+    def setPeriod(self, start, end):
+        self.start = start
+        self.end = end
 
-def neg_sharp_ratio(weights, mean_returns, cov_matrix, risk_free_rate):
-    p_var, p_ret = portfolio_annualised_performance(weights, mean_returns, cov_matrix)
+    def setup(self):
+        self.assets = self.assets.dropna()
+        self.returns = self.assets.pct_change()
+        self.mean_returns = self.returns.mean()
+        self.cov_matrix = self.returns.cov()
 
-    return -(p_ret - risk_free_rate) / p_var
+    def portfolio_annualised_performance(self, weights, mean_returns, cov_matrix):
+        returns = np.sum(mean_returns * weights) * self.num_periods_annually
+        std = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights))) * np.sqrt(self.num_periods_annually)
 
+        return std, returns
 
-def max_sharp_ratio(mean_returns, cov_matrix, risk_free_rate):
-    num_assets = len(mean_returns)
-    args = (mean_returns, cov_matrix, risk_free_rate)
-    constraints = ({'type':'eq', 'fun': lambda x: np.sum(x) - 1})
-    bound = (0.0, 1.0)
-    bounds = tuple(bound for asset in range(num_assets))
+    def neg_sharp_ratio(self, weights, mean_returns, cov_matrix, risk_free_rate):
+        p_var, p_ret = self.portfolio_annualised_performance(weights, mean_returns, cov_matrix)
 
-    result = sco.minimize(neg_sharp_ratio, num_assets * [1./num_assets,], args=args,
-                           method='SLSQP', bounds=bounds, constraints=constraints)
+        return -(p_ret - risk_free_rate) / p_var
 
-    return result
+    def max_sharp_ratio(self, mean_returns, cov_matrix, risk_free_rate):
+        num_assets = len(mean_returns)
+        args = (mean_returns, cov_matrix, risk_free_rate)
+        constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+        bound = (0.0, 1.0)
+        bounds = tuple(bound for asset in range(num_assets))
 
-#Также можно определить оптимизирующую функцию для расчета минимального показателя риска.
-# #На этот раз минимизируем целевую функцию – риск (min_variance), используя разные показатели долей акций.
-# #"Constraints" и "bounds" такие же, как и выше.
+        result = sco.minimize(self.neg_sharp_ratio, num_assets * [1. / num_assets, ], args=args,
+                              method='SLSQP', bounds=bounds, constraints=constraints)
 
+        return result
 
-def portfolio_volatility(weights, mean_returns, cov_matrix):
-    return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[0]
+    # Также можно определить оптимизирующую функцию для расчета минимального показателя риска.
+    # #На этот раз минимизируем целевую функцию – риск (min_variance), используя разные показатели долей акций.
+    # #"Constraints" и "bounds" такие же, как и выше.
 
+    def portfolio_volatility(self, weights, mean_returns, cov_matrix):
+        return self.portfolio_annualised_performance(weights, mean_returns, cov_matrix)[0]
 
-def min_variance(mean_returns, cov_matrix):
-    num_assets = len(mean_returns)
-    args = (mean_returns, cov_matrix)
-    constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
-    bound = (0.0,1.0)
-    bounds = tuple(bound for asset in range(num_assets))
+    def min_variance(self, mean_returns, cov_matrix):
+        num_assets = len(mean_returns)
+        args = (mean_returns, cov_matrix)
+        constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+        bound = (0.0, 1.0)
+        bounds = tuple(bound for asset in range(num_assets))
 
-    result = sco.minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args,
-                          method='SLSQP', bounds=bounds, constraints=constraints)
+        result = sco.minimize(self.portfolio_volatility, num_assets * [1. / num_assets, ], args=args,
+                              method='SLSQP', bounds=bounds, constraints=constraints)
 
-    return result
+        return result
 
+    def efficient_return(self, mean_returns, cov_matrix, target):
+        num_assets = len(mean_returns)
+        args = (mean_returns, cov_matrix)
 
-def efficient_return(mean_returns, cov_matrix, target):
-    num_assets = len(mean_returns)
-    args = (mean_returns, cov_matrix)
+        def portfolio_return(weights):
+            return self.portfolio_annualised_performance(weights, mean_returns, cov_matrix)[1]
 
-    def portfolio_return(weights):
-        return portfolio_annualised_performance(weights, mean_returns, cov_matrix)[1]
+        constraints = ({'type': 'eq', 'fun': lambda x: portfolio_return(x) - target},
+                       {'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+        bounds = tuple((0, 1) for asset in range(num_assets))
+        result = sco.minimize(self.portfolio_volatility, num_assets * [1. / num_assets, ], args=args,
+                              method='SLSQP', bounds=bounds, constraints=constraints)
+        return result
 
-    constraints = ({'type': 'eq', 'fun': lambda x: portfolio_return(x) - target},
-                   {'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
-    bounds = tuple((0,1) for asset in range(num_assets))
-    result = sco.minimize(portfolio_volatility, num_assets*[1./num_assets,], args=args,
-                          method='SLSQP', bounds=bounds, constraints=constraints)
-    return result
+    def efficient_frontier(self, mean_returns, cov_matrix, returns_range):
+        efficients = []
+        for ret in returns_range:
+            efficients.append(self.efficient_return(mean_returns, cov_matrix, ret))
+        return efficients
 
+    def random_portfolios(self, num_portfolios, mean_returns, cov_matrix, risk_free_rate, stocks):
+        results = np.zeros((3, num_portfolios))
+        weights_record = []
+        for i in range(num_portfolios):
+            weights = np.random.random(len(stocks))
+            weights /= np.sum(weights)
+            weights_record.append(weights)
+            portfolio_std_dev, portfolio_return = self.portfolio_annualised_performance(weights, mean_returns,
+                                                                                        cov_matrix)
+            results[0, i] = portfolio_std_dev
+            results[1, i] = portfolio_return
+            results[2, i] = (portfolio_return - risk_free_rate) / portfolio_std_dev
 
-def efficient_frontier(mean_returns, cov_matrix, returns_range):
-    efficients = []
-    for ret in returns_range:
-        efficients.append(efficient_return(mean_returns, cov_matrix, ret))
-    return efficients
+        return results, weights_record
 
+    def perform_analysis(self):
+        if len(self.tickets) == 0:
+            return
 
-def random_portfolios(num_portfolios, mean_returns, cov_matrix, risk_free_rate, stocks):
-    results = np.zeros((3, num_portfolios))
-    weights_record = []
-    for i in range(num_portfolios):
-        weights = np.random.random(len(stocks))
-        weights /= np.sum(weights)
-        weights_record.append(weights)
-        portfolio_std_dev, portfolio_return = portfolio_annualised_performance(weights, mean_returns, cov_matrix)
-        results[0,i] = portfolio_std_dev
-        results[1,i] = portfolio_return
-        results[2,i] = (portfolio_return - risk_free_rate) / portfolio_std_dev
+        self.setup()
+        max_sharpe = self.max_sharp_ratio(self.mean_returns, self.cov_matrix, self.risk_free_rate)
+        min_vol = self.min_variance(self.mean_returns, self.cov_matrix)
 
-    return results, weights_record
+        print("SHARPE, VOL: ", max_sharpe, min_vol)
+
+        sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
+
+        print("SDP, RP:", sdp, rp)
+        max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
+        max_sharpe_allocation.allocation = [round(i * 100, 2) for i in max_sharpe_allocation.allocation]
+        max_sharpe_allocation = max_sharpe_allocation.T
+
+        sdp_min, rp_min = self.portfolio_annualised_performance(min_vol['x'], self.mean_returns, self.cov_matrix)
+        print("SDP MIN: ", sdp_min)
+        print("RP MIN: ", rp_min)
+        min_vol_allocation = pd.DataFrame(min_vol.x.copy(), index=self.assets.columns, columns=['allocation'])
+        print("MIN VOL ALLOC: ", min_vol_allocation)
+        min_vol_allocation.allocation = [round(i * 100, 2) for i in min_vol_allocation.allocation]
+        min_vol_allocation = min_vol_allocation.T
+        print("MIN VOL ALLOC: ", min_vol_allocation)
+
+        target = np.linspace(rp_min, 0.00081, 20)
+        efficient_portfolios = self.efficient_frontier(self.mean_returns, self.cov_matrix, target)
+
+        results, _ = self.random_portfolios(
+            self.num_portfolios, self.mean_returns, self.cov_matrix, self.risk_free_rate, self.tickets)
+
+        print(results)
+
+        print("-" * 80)
+        print("Распределение долей акций в портфеле с максимальным коэффициентом Шарпа:\n")
+        print("Годовая доходность:", round(rp, 3))
+        print("Годовой риск:", round(sdp, 3))
+        print("Коэффициент Шарпа:", round((rp - self.risk_free_rate) / sdp, 3))
+        print(max_sharpe_allocation)
+        print("-" * 80)
+        print("Распределение долей акций в портфеле с наименьшим показателем риска:\n")
+        print("Годовая доходность:", round(rp_min, 3))
+        print("Годовой риск:", round(sdp_min, 3))
+        print("Коэффициент Шарпа:", round((rp_min - self.risk_free_rate) / sdp_min, 3))
+        print(min_vol_allocation)
+
+        plt.figure(figsize=(10, 7))
+        plt.scatter(results[0, :], results[1, :], c=results[2, :], cmap='YlGnBu', marker='o', s=10, alpha=0.3)
+        plt.colorbar(label='Коэффициент Шарпа:')
+        plt.scatter(sdp, rp, marker='*', color='r', s=500, label='Максимальный коэф-т Шарпа')
+        plt.scatter(sdp_min, rp_min, marker='*', color='g', s=500, label='Минимальный риск')
+
+        plt.plot([p['fun'] for p in efficient_portfolios], target, 'k-x', label='граница эффективности')
+        plt.title('Оптимизация портфеля на основе построения эффективной границы')
+        plt.xlabel('Риск(стандартное отклонение)')
+        plt.ylabel('Доходность')
+        plt.grid(True, linestyle='--')
+        plt.legend(labelspacing=0.8)
+
+        plt.tight_layout();
+        plt.show()
+
+        ind = np.arange(self.assets.columns.size)
+        width = 0.35
+
+        plt.figure(figsize=(8, 6))
+        plt.bar(ind, max_sharpe['x'], width, color='r', alpha=0.75)
+        plt.bar(ind + width, min_vol['x'], width, color='b', alpha=0.75)
+
+        plt.xticks(ind, self.tickets)
+        plt.ylabel('Распределение акций в портфеле')
+        plt.title('Cравнение сотавов портфелей')
+        plt.legend(('Максимальный коэф-т Шарпа', 'Минимальный Риск'))
+        plt.grid(visible=True, linestyle='--')
+
+        plt.tight_layout()
+        plt.show()
+
+        max_sharpe = self.max_sharp_ratio(self.mean_returns, self.cov_matrix, self.risk_free_rate)
+        sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
+        max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
+        max_sharpe_allocation.allocation = [round(i * 100, 2) for i in max_sharpe_allocation.allocation]
+        max_sharpe_allocation = max_sharpe_allocation.T
+
+        min_vol = self.min_variance(self.mean_returns, self.cov_matrix)
+        sdp_min, rp_min = self.portfolio_annualised_performance(min_vol['x'], self.mean_returns, self.cov_matrix)
+        min_vol_allocation = pd.DataFrame(min_vol.x.copy(), index=self.assets.columns, columns=['allocation'])
+        min_vol_allocation.allocation = [round(i * 100, 2) for i in min_vol_allocation.allocation]
+        min_vol_allocation = min_vol_allocation.T
+
+        an_vol = np.std(self.returns) * np.sqrt(self.num_periods_annually)
+        an_rt = self.mean_returns * self.num_periods_annually
+
+        target = np.linspace(rp_min, 0.00081, 20)
+        efficient_portfolios = self.efficient_frontier(self.mean_returns, self.cov_matrix, target)
+
+        print("-" * 80)
+        print("Распределение долей акций в портфеле с максимальным коэффициентом Шарпа\n")
+        print("Годовая доходность:", round(rp, 2))
+        print("Годовой риск:", round(sdp, 2))
+        print("Коэффициент Шарпа:", round((rp - self.risk_free_rate) / sdp, 3))
+        print(max_sharpe_allocation)
+        print("-" * 80)
+        print("Распределение долей акций в портфеле с наименьшим показателем риска:\n")
+        print("Годовая доходность:", round(rp_min, 2))
+        print("Годовой риск:", round(sdp_min, 2))
+        print("Коэффициент Шарпа:", round((rp_min - self.risk_free_rate) / sdp_min, 3))
+        print(min_vol_allocation)
+        print("-" * 80)
+
+        print("Показатели доходности и риска каждой отдельной акции:\n")
+        for i, txt in enumerate(self.assets.columns):
+            print(txt, ":", "годовая доходность:", round(an_rt[i], 2), ", годовой риск:", round(an_vol[i], 2))
+        print("-" * 80)
+
+        plt.subplots(figsize=(10, 7))
+
+        for i, txt in enumerate(self.assets.columns):
+            plt.annotate(txt, (an_vol[i], an_rt[i]), xytext=(10, 0), textcoords='offset points')
+
+        # coolwarm RdBu YlGnBu
+        plt.scatter(results[0, :], results[1, :], c=results[2, :], cmap=cm.YlGnBu, marker='o', s=10, alpha=0.3)
+        plt.colorbar(label='Коэффициент Шарпа')
+
+        plt.scatter(sdp, rp, marker='s', color='r', s=150, label='Максимальный коэф-т Шарпа')
+        plt.scatter(sdp_min, rp_min, marker='s', color='g', s=150, label='Минимальный риск')
+
+        plt.scatter(an_vol, an_rt, marker='o', s=200, c='blue', edgecolors='black')
+
+        plt.plot([p['fun'] for p in efficient_portfolios], target, 'k-x', linewidth=2,
+                 label='граница эффективности')
+        plt.title('Оптимизация портфеля и показатели отдельный акций')
+        plt.xlabel('Риск (стандартное отклонение)')
+        plt.ylabel('Доходность')
+        plt.legend(labelspacing=0.8)
+        plt.grid(True, linestyle='--')
+
+        # plt.xlim(0.02, 0.03)
+        # plt.ylim(-0.0002, 0.0011)
+
+        plt.tight_layout();
+        plt.show()

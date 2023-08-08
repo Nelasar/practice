@@ -165,4 +165,3 @@ def svm_reg_trading(symbol):
     dfc['return'] = dfc['strategy']
     BackTest(dfc['return'].iloc[split:])
 
-svm_reg_trading("^IXIC")

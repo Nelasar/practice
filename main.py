@@ -20,14 +20,12 @@ from PyQt5 import uic
 import sys
 
 mrkt = Market()
-
+mrkvz = MarkovitzAnalyzer()
 
 class newWindow(QWidget):
     def __init__(self, row_data):
         super().__init__()
-
         self.layout = QVBoxLayout()
-
         self.tableWidget = QTableWidget()
         self.tableWidget.setColumnCount(len(row_data))
         self.tableWidget.setRowCount(1)
@@ -36,6 +34,7 @@ class newWindow(QWidget):
 
         self.layout.addWidget(self.tableWidget)
         self.setLayout(self.layout)
+        self.coords = 0
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -44,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.btnMarket.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_1))
         self.btnPortfolio.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_2))
+        self.analBtn.clicked.connect(mrkvz.perform_analysis)
 
         self.tableWidget.setColumnWidth(0, 80)
         self.tableWidget.setColumnWidth(1, 315)
@@ -52,7 +52,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.sec_count = 0
 
+        self.addBtn.setEnabled(False)
         self.description_window = QWidget()
+        self.markovitz_window = QWidget()
 
         for asset in mrkt.allAssets():
             print(asset.getTicket(), asset.getName())
@@ -71,22 +73,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             row_data = [self.tableWidget.item(item.row(), col).text() for col in range(self.tableWidget.columnCount())]
             new_window(row_data)
 
+        def cell_clicked(item):
+            self.addBtn.setEnabled(True)
+            self.coords = item.row()
+
+        def button_clicked():
+            st = str(self.tableWidget.item(self.coords, 0).text())
+            if mrkvz.check(st):
+                print("IN!!!")
+                #print(mrkvz.check())
+                return
+            else:
+                mrkvz.addAsset(mrkt.getAsset(st))
+                print(type(mrkt.getAsset(self.tableWidget.item(self.coords, 0).text())))
+                print("ASSETS: ", mrkvz.getAssetsCount())
+
+
+
         def new_window(row_data):
             self.description_window = newWindow(row_data)
             self.description_window.resize(400, 400)
             self.description_window.setWindowTitle("Row Data")
             self.description_window.show()
 
+        self.tableWidget.itemClicked.connect(cell_clicked)
         self.tableWidget.itemDoubleClicked.connect(cell_double_clicked)
-
-        #self.tableWidget.activated.connect(new_window())
-
-
-        #self.tableWidget.activated.connect()
-
-
-
-
+        self.addBtn.clicked.connect(button_clicked)
 
 if __name__ == "__main__":
     #stock1 = Stock("test stock1", 1234.34, 20)
@@ -518,7 +530,16 @@ if __name__ == "__main__":
 
     #print(portfolio.weighting())
 
-    mrkt.printMarket()
+    #mrkt.printMarket()
+
+    print(mrkvz.getAssetsCount())
+    # mrkvz.addAsset(mrkt.getAsset('GOOG'))
+    print(mrkvz.getAssetsCount())
+    # mrkvz.addAsset(mrkt.getAsset('PYPL'))
+    print(mrkvz.getAssetsCount())
+    # mrkvz.addAsset(mrkt.getAsset('MSFT'))
+    print(mrkvz.getAssetsCount())
+    #mrkvz.perform_analysis()
 
     app = QtWidgets.QApplication(sys.argv)
 

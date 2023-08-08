@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1105</width>
-    <height>727</height>
+    <width>1071</width>
+    <height>712</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -62,11 +62,9 @@
            <height>501</height>
           </rect>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QHeaderView{
-	color: blue;
-}</string>
-         </property>
+         <attribute name="horizontalHeaderCascadingSectionResizes">
+          <bool>true</bool>
+         </attribute>
          <column>
           <property name="text">
            <string>ТИКЕР</string>
@@ -75,9 +73,6 @@
          <column>
           <property name="text">
            <string>НАЗВАНИЕ</string>
-          </property>
-          <property name="textAlignment">
-           <set>AlignLeading|AlignVCenter</set>
           </property>
          </column>
          <column>
@@ -105,6 +100,58 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="btnBuy">
+         <property name="geometry">
+          <rect>
+           <x>750</x>
+           <y>430</y>
+           <width>171</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>КУПИТЬ</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="addBtn">
+         <property name="geometry">
+          <rect>
+           <x>740</x>
+           <y>360</y>
+           <width>71</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ДОБАВИТЬ</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_3">
+         <property name="geometry">
+          <rect>
+           <x>760</x>
+           <y>330</y>
+           <width>181</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ДОБАВИТЬ В АНАЛИЗАТОР</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="analBtn">
+         <property name="geometry">
+          <rect>
+           <x>840</x>
+           <y>360</y>
+           <width>71</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>АНАЛ</string>
          </property>
         </widget>
        </widget>
@@ -146,7 +193,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1105</width>
+     <width>1071</width>
      <height>26</height>
     </rect>
    </property>
