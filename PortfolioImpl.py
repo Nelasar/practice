@@ -1,7 +1,7 @@
 class PortfolioImpl:
     def __init__(self):
-        self.securities = {"Stock": list()}
-        # self.securities["Stock"] = list()
+        self.securities = {'Stock': list()}
+        self.quantities = {'Stock': list()}
 
     def printSecurities(self):
         for storage_type, securities_list in self.securities.items():

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1071</width>
+    <width>1069</width>
     <height>712</height>
    </rect>
   </property>
@@ -53,7 +53,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <widget class="QWidget" name="page_1">
-        <widget class="QTableWidget" name="tableWidget">
+        <widget class="QTableWidget" name="tableMarket">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -77,7 +77,7 @@
          </column>
          <column>
           <property name="text">
-           <string>ОПИСАНИЕ</string>
+           <string>ОТРАСЛЬ</string>
           </property>
          </column>
          <column>
@@ -86,12 +86,12 @@
           </property>
          </column>
         </widget>
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="labelMarket">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>360</x>
            <y>0</y>
-           <width>721</width>
+           <width>331</width>
            <height>41</height>
           </rect>
          </property>
@@ -106,7 +106,7 @@
          <property name="geometry">
           <rect>
            <x>750</x>
-           <y>430</y>
+           <y>410</y>
            <width>171</width>
            <height>91</height>
           </rect>
@@ -115,11 +115,11 @@
           <string>КУПИТЬ</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="addBtn">
+        <widget class="QPushButton" name="addBtnMarket">
          <property name="geometry">
           <rect>
-           <x>740</x>
-           <y>360</y>
+           <x>760</x>
+           <y>310</y>
            <width>71</width>
            <height>41</height>
           </rect>
@@ -128,25 +128,25 @@
           <string>ДОБАВИТЬ</string>
          </property>
         </widget>
-        <widget class="QLabel" name="label_3">
+        <widget class="QLabel" name="labelMarkovitzMarket">
          <property name="geometry">
           <rect>
-           <x>760</x>
-           <y>330</y>
+           <x>750</x>
+           <y>30</y>
            <width>181</width>
            <height>31</height>
           </rect>
          </property>
          <property name="text">
-          <string>ДОБАВИТЬ В АНАЛИЗАТОР</string>
+          <string>МАРКОВИЦ</string>
          </property>
         </widget>
-        <widget class="QPushButton" name="analBtn">
+        <widget class="QPushButton" name="analBtnMarket">
          <property name="geometry">
           <rect>
-           <x>840</x>
+           <x>760</x>
            <y>360</y>
-           <width>71</width>
+           <width>151</width>
            <height>41</height>
           </rect>
          </property>
@@ -154,9 +154,60 @@
           <string>АНАЛ</string>
          </property>
         </widget>
+        <widget class="QPushButton" name="rmvBtnMarket">
+         <property name="geometry">
+          <rect>
+           <x>840</x>
+           <y>310</y>
+           <width>71</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>УБРАТЬ</string>
+         </property>
+        </widget>
+        <widget class="QTableWidget" name="tableAnalMarket">
+         <property name="geometry">
+          <rect>
+           <x>780</x>
+           <y>70</y>
+           <width>121</width>
+           <height>221</height>
+          </rect>
+         </property>
+         <column>
+          <property name="text">
+           <string>ТИКЕР</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QLineEdit" name="searchLinePortfMarket">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>10</y>
+           <width>241</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="searchBtnPortfMarket">
+         <property name="geometry">
+          <rect>
+           <x>250</x>
+           <y>10</y>
+           <width>93</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ПОИСК</string>
+         </property>
+        </widget>
        </widget>
        <widget class="QWidget" name="page_2">
-        <widget class="QTableWidget" name="tableWidget_2">
+        <widget class="QTableWidget" name="tablePortfolio">
          <property name="geometry">
           <rect>
            <x>0</x>
@@ -165,14 +216,124 @@
            <height>501</height>
           </rect>
          </property>
+         <column>
+          <property name="text">
+           <string>ТИКЕР</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>НАЗВАНИЕ</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ОТРАСЛЬ</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>ЦЕНА</string>
+          </property>
+         </column>
         </widget>
-        <widget class="QLabel" name="label_2">
+        <widget class="QPushButton" name="addBtnPortf">
+         <property name="geometry">
+          <rect>
+           <x>760</x>
+           <y>310</y>
+           <width>71</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ДОБАВИТЬ</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="analBtnPortf">
+         <property name="geometry">
+          <rect>
+           <x>760</x>
+           <y>360</y>
+           <width>151</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>АНАЛ</string>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="sellBtnPortf">
+         <property name="geometry">
+          <rect>
+           <x>750</x>
+           <y>410</y>
+           <width>171</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ПРОДАТЬ</string>
+         </property>
+        </widget>
+        <widget class="QTableWidget" name="tableAnalPortf">
+         <property name="geometry">
+          <rect>
+           <x>780</x>
+           <y>70</y>
+           <width>121</width>
+           <height>221</height>
+          </rect>
+         </property>
+         <column>
+          <property name="text">
+           <string>ТИКЕР</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QPushButton" name="rmvBtnPortf">
+         <property name="geometry">
+          <rect>
+           <x>840</x>
+           <y>310</y>
+           <width>71</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>УБРАТЬ</string>
+         </property>
+        </widget>
+        <widget class="QLineEdit" name="searchLinePortf">
          <property name="geometry">
           <rect>
            <x>0</x>
+           <y>10</y>
+           <width>241</width>
+           <height>21</height>
+          </rect>
+         </property>
+        </widget>
+        <widget class="QPushButton" name="searchBtnPortf">
+         <property name="geometry">
+          <rect>
+           <x>250</x>
+           <y>10</y>
+           <width>93</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>ПОИСК</string>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelPortf">
+         <property name="geometry">
+          <rect>
+           <x>360</x>
            <y>0</y>
-           <width>721</width>
-           <height>41</height>
+           <width>331</width>
+           <height>31</height>
           </rect>
          </property>
          <property name="text">
@@ -180,6 +341,19 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+        <widget class="QLabel" name="labelMarkovitz_2">
+         <property name="geometry">
+          <rect>
+           <x>750</x>
+           <y>30</y>
+           <width>181</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>МАРКОВИЦ</string>
          </property>
         </widget>
        </widget>
@@ -193,7 +367,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1071</width>
+     <width>1069</width>
      <height>26</height>
     </rect>
    </property>

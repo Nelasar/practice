@@ -46,7 +46,6 @@ def SMA(security):
     plt.legend()
     plt.show()
 
-
 def MSD(security):
     df = makeDataFrame(security)
     df["returns"] = df["close"].pct_change(1)
@@ -64,7 +63,6 @@ def MSD(security):
     plt.title('Generated Values over Time')
     plt.legend()
     plt.show()
-
 
 # симуляция истории цен через нормальное распределение (random walk)
 def simulateHistory(start_price):

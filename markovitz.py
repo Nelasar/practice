@@ -20,24 +20,40 @@ class MarkovitzAnalyzer:
         self.mean_returns = pd.DataFrame()
         self.cov_matrix = pd.DataFrame()
 
+        #self.year_income_max_sharpe = 0
+        #self.year_risk_max_sharpe = 0
+        #self.sharpe_ratio = 0
+        #self.year_income_min_risk = 0
+        #self.year_risk_min_risk = 0
+        #self.min_sharpe = 0
     def getAssetsCount(self):
         return len(self.tickets)
 
     def addTicketName(self, ticket):
         self.tickets.append(ticket)
 
+    def checkTicket(self, ticket):
+        if ticket in self.tickets:
+            return True
+        else:
+            return False
+
     def check(self, ticket):
         for t in self.tickets:
-            if t == ticket: return True
+            if t == ticket:
+                return True
         return False
     def addAsset(self, asset):
         self.assets[asset.getTicket()] = asset.getPriceHistory()
         self.tickets.append(asset.getTicket())
         print("TICKETS:", self.tickets)
-        # print(self.assets.columns)
-        # self.assets = self.assets.loc['2022-01-01':'2023-01-01']
-        # self.assets = np.append(self.assets, asset)
-        # self.assets = self.assets.dropna()
+        print(self.assets)
+
+    def removeAsset(self, asset):
+        self.assets = self.assets.drop(str(asset), axis=1)
+        self.tickets.remove(asset)
+        print("TICKETS:", self.tickets)
+        print(self.assets)
 
     def printTickets(self):
         print(self.tickets)
@@ -145,23 +161,16 @@ class MarkovitzAnalyzer:
         max_sharpe = self.max_sharp_ratio(self.mean_returns, self.cov_matrix, self.risk_free_rate)
         min_vol = self.min_variance(self.mean_returns, self.cov_matrix)
 
-        print("SHARPE, VOL: ", max_sharpe, min_vol)
-
         sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
 
-        print("SDP, RP:", sdp, rp)
         max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
         max_sharpe_allocation.allocation = [round(i * 100, 2) for i in max_sharpe_allocation.allocation]
         max_sharpe_allocation = max_sharpe_allocation.T
 
         sdp_min, rp_min = self.portfolio_annualised_performance(min_vol['x'], self.mean_returns, self.cov_matrix)
-        print("SDP MIN: ", sdp_min)
-        print("RP MIN: ", rp_min)
         min_vol_allocation = pd.DataFrame(min_vol.x.copy(), index=self.assets.columns, columns=['allocation'])
-        print("MIN VOL ALLOC: ", min_vol_allocation)
         min_vol_allocation.allocation = [round(i * 100, 2) for i in min_vol_allocation.allocation]
         min_vol_allocation = min_vol_allocation.T
-        print("MIN VOL ALLOC: ", min_vol_allocation)
 
         target = np.linspace(rp_min, 0.00081, 20)
         efficient_portfolios = self.efficient_frontier(self.mean_returns, self.cov_matrix, target)
@@ -169,53 +178,30 @@ class MarkovitzAnalyzer:
         results, _ = self.random_portfolios(
             self.num_portfolios, self.mean_returns, self.cov_matrix, self.risk_free_rate, self.tickets)
 
-        print(results)
 
         print("-" * 80)
         print("Распределение долей акций в портфеле с максимальным коэффициентом Шарпа:\n")
         print("Годовая доходность:", round(rp, 3))
+        #self.year_income_max_sharpe = round(rp, 3)
         print("Годовой риск:", round(sdp, 3))
+        #self.year_risk_max_sharpe = round(sdp, 3)
         print("Коэффициент Шарпа:", round((rp - self.risk_free_rate) / sdp, 3))
+        #self.sharpe_ratio = round((rp - self.risk_free_rate) / sdp, 3)
         print(max_sharpe_allocation)
         print("-" * 80)
         print("Распределение долей акций в портфеле с наименьшим показателем риска:\n")
         print("Годовая доходность:", round(rp_min, 3))
+        #self.year_income_min_risk = round(rp_min, 3)
         print("Годовой риск:", round(sdp_min, 3))
+        #self.year_risk_min_risk = round(sdp_min, 3)
         print("Коэффициент Шарпа:", round((rp_min - self.risk_free_rate) / sdp_min, 3))
+        #self.min_sharpe = round((rp_min - self.risk_free_rate) / sdp_min, 3)
         print(min_vol_allocation)
-
-        plt.figure(figsize=(10, 7))
-        plt.scatter(results[0, :], results[1, :], c=results[2, :], cmap='YlGnBu', marker='o', s=10, alpha=0.3)
-        plt.colorbar(label='Коэффициент Шарпа:')
-        plt.scatter(sdp, rp, marker='*', color='r', s=500, label='Максимальный коэф-т Шарпа')
-        plt.scatter(sdp_min, rp_min, marker='*', color='g', s=500, label='Минимальный риск')
-
-        plt.plot([p['fun'] for p in efficient_portfolios], target, 'k-x', label='граница эффективности')
-        plt.title('Оптимизация портфеля на основе построения эффективной границы')
-        plt.xlabel('Риск(стандартное отклонение)')
-        plt.ylabel('Доходность')
-        plt.grid(True, linestyle='--')
-        plt.legend(labelspacing=0.8)
-
-        plt.tight_layout();
-        plt.show()
 
         ind = np.arange(self.assets.columns.size)
         width = 0.35
 
-        plt.figure(figsize=(8, 6))
-        plt.bar(ind, max_sharpe['x'], width, color='r', alpha=0.75)
-        plt.bar(ind + width, min_vol['x'], width, color='b', alpha=0.75)
-
-        plt.xticks(ind, self.tickets)
-        plt.ylabel('Распределение акций в портфеле')
-        plt.title('Cравнение сотавов портфелей')
-        plt.legend(('Максимальный коэф-т Шарпа', 'Минимальный Риск'))
-        plt.grid(visible=True, linestyle='--')
-
-        plt.tight_layout()
-        plt.show()
-
+        '''
         max_sharpe = self.max_sharp_ratio(self.mean_returns, self.cov_matrix, self.risk_free_rate)
         sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
         max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
@@ -280,3 +266,12 @@ class MarkovitzAnalyzer:
 
         plt.tight_layout();
         plt.show()
+        
+        '''
+
+        return [round(rp, 3), round(sdp, 3),
+                round((rp - self.risk_free_rate) / sdp, 3), round(rp_min, 3),
+                round(sdp_min, 3), round((rp_min - self.risk_free_rate) / sdp_min, 3),
+                results, efficient_portfolios, target,
+                ind, width,
+                max_sharpe, min_vol]

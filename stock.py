@@ -1,35 +1,45 @@
-import random
+from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QGridLayout, QWidget
+from PyQt5.QtCore import Qt
+import pyqtgraph as pg
+from datetime import datetime
+import pandas as pd
 
-from priceable import Priceable
-from matlib import *
+class DateAxisItem(pg.AxisItem):
+    def tickStrings(self, values, scale, spacing):
+        return [datetime.fromtimestamp(value).strftime('%Y-%m-%d') for value in values]
 
+class infoWindow(QWidget):
+    def __init__(self, asset, parent=None):
+        super().init(parent)
+        layout = QGridLayout(self)
+        self.history = asset.getPriceHistory()
+        self.plot_widget = pg.PlotWidget(axisItems={'bottom': DateAxisItem()})
+        self.plot_widget.showGrid(x=True, y=True)
+        self.plot_widget.setLabel('bottom', 'X')
+        self.plot_widget.setLabel('left', 'Y')
 
-class Stock(Priceable):
-    def __init__(self, s_name="", s_price=0.0, s_quantity=0, s_price_hist=list()):
-        self.name = s_name
-        self.price = s_price
-        self.quantity = s_quantity
-        self.price_history = s_price_hist
-        self.type = "Stock"
+        self.plot_widget.plot(x=self.history.index, y=self.history.values.flatten())
 
-        n = random.randint(20, 50)
+        layout.addWidget(self.plot_widget, 0, 0, 1, 1)
+        self.setLayout(layout)
 
-        self.price_history = GBM(n, T, r, q, sigma, self.price)
+class MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Main Window")
 
-    def getName(self):
-        return self.name
+        button = QPushButton("Open infoWindow", self)
+        button.setGeometry(100, 100, 150, 50)
+        button.clicked.connect(self.open_info_window)
 
-    def getPrice(self):
-        return self.price
+    def open_info_window(self):
+        asset = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=['A', 'B', 'C'],
+                             index=pd.date_range(start='20220101', periods=3))
+        self.info_window = infoWindow(asset)
+        self.info_window.show()
 
-    def getQuantity(self):
-        return self.quantity
-
-    def setPrice(self, p):
-        self.price = p
-
-    def getPriceHistory(self):
-        return self.price_history
-
-    def getType(self):
-        return self.type
+if __name__ == '__main__':
+    app = QApplication([])
+    mainWin = MainWindow()
+    mainWin.show()
+    app.exec_()
