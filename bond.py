@@ -1,65 +1,128 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, \
-    QGridLayout, QTableWidget, QTableWidgetItem, QPushButton
+from PortfolioImpl import *
+import pandas as pd
+from technical_analysis import *
+from markovitz import *
+from yahoostock import *
+from sklearn.linear_model import LinearRegression
+from vectorized import *
+from market import *
+from u import *
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView, QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QIntValidator
+from PyQt5 import uic
+from pyqtgraph import PlotWidget, plot, Qt
 import pyqtgraph as pg
-from PyQt5 import QtWidgets
+from pyqtgraph import DateAxisItem
+import sys
+from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow
+# from linearregression import StockAnalysis
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
+class InfoWindow(QWidget):
+    def __init__(self, asset):
         super().__init__()
-        self.setGeometry(100, 100, 700, 500)
-        layout = QVBoxLayout()
-        button = QPushButton("Open New Window")
-        button.clicked.connect(self.open_new_window)
-        layout.addWidget(button)
+        self.layout = QGridLayout(self)
+        self.resize(800, 500)
+        self.history = asset.getPriceHistory()
 
-        central_widget = QWidget()
-        central_widget.setLayout(layout)
-        self.setCentralWidget(central_widget)
+        x = self.history.index
+        x = x.to_pydatetime().tolist()
+        self.y = self.history.values.flatten()
+        self.x_float = [date.timestamp() for date in x]
 
-        self.new_window = None
-
-    def open_new_window(self):
-        self.new_window = NewWindow()
-        self.new_window.show()
-
-
-class NewWindow(QtWidgets.QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        layout = QGridLayout(self)
-        self.plot_widget = pg.PlotWidget()
+        self.plot_widget = pg.PlotWidget(axisItems={'bottom': DateAxisItem()})
         self.plot_widget.setLabel('bottom', 'X')
         self.plot_widget.setLabel('left', 'Y')
-        layout.addWidget(self.plot_widget, 0, 0, 1, 1)
+        self.layout.addWidget(self.plot_widget, 0, 0, 1, 1)
 
-        self.scatter_plot = pg.ScatterPlotItem()
-        self.scatter_plot.setData([1, 3, 2, 4, 6, 8], [3, 6, 2, 8, 4, 7],
-                                  pen=None, symbol='o', symbolSize=5, symbolBrush=(255, 0, 0))
-        self.plot_widget.addItem(self.scatter_plot)
-
-        self.line_plot = pg.PlotDataItem()
-        self.line_plot.setData([1, 2, 3, 4, 5, 6], [2, 4, 6, 8, 10, 12], pen=(0, 255, 0))
+        self.line_plot = pg.PlotCurveItem()
+        self.line_plot.setData(x=self.x_float, y=self.y, pen=(0, 255, 0))
         self.plot_widget.addItem(self.line_plot)
 
-        self.bar_view = pg.PlotWidget()
-        self.bar_graph = pg.BarGraphItem(x=[1, 3, 2, 4, 6, 8], height=[3, 6, 2, 8, 4, 7], width=0.6, brush=(255, 0, 0))
-        self.bar_view.addItem(self.bar_graph)
-        layout.addWidget(self.bar_view, 0, 1, 1, 1)
+        self.table = QTableWidget(9, 2)
+        self.table.setHorizontalHeaderLabels(["Параметр", "Значение"])
+        self.layout.addWidget(self.table, 0, 1, 1, 1)
 
-        table = QTableWidget(6, 2)
-        table.setHorizontalHeaderLabels(["Column 1", "Column 2"])
-        layout.addWidget(table, 1, 0, 1, 2)
+        self.table.setItem(0, 0, QTableWidgetItem("Ticket"))
+        self.table.setItem(1, 0, QTableWidgetItem("Name"))
+        self.table.setItem(2, 0, QTableWidgetItem("Country"))
+        self.table.setItem(3, 0, QTableWidgetItem("Industry"))
+        self.table.setItem(4, 0, QTableWidgetItem("Price"))
+        self.table.setItem(5, 0, QTableWidgetItem("Beta"))
+        self.table.setItem(6, 0, QTableWidgetItem("Low"))
+        self.table.setItem(7, 0, QTableWidgetItem("High"))
+        self.table.setItem(8, 0, QTableWidgetItem("Open"))
 
-        for row in range(6):
-            for col in range(2):
-                item = QTableWidgetItem(f"({row}, {col})")
-                table.setItem(row, col, item)
+        headers = self.table.horizontalHeader()
+        headers.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+
+        values = asset.getInfoValues()
+
+        index = 0
+        for key in values.keys():
+            self.table.setItem(index, 1, QTableWidgetItem(values[key]))
+            index += 1
+
+        self.text_label = QLabel()
+        self.layout.addWidget(self.text_label, 1, 0, 1, 2)
+
+        self.button_layout = QGridLayout()
+        self.button_layout.setSpacing(10)
+
+        self.button1 = QPushButton("Button 1")
+        self.button2 = QPushButton("Button 2")
+        self.button3 = QPushButton("Button 3")
+        self.button4 = QPushButton("Button 4")
+
+        self.button1.clicked.connect(self.showGraph1)
+        self.button2.clicked.connect(self.showGraph2)
+        self.button3.clicked.connect(self.showGraph3)
+        self.button4.clicked.connect(self.showGraph4)
+
+        self.button_layout.addWidget(self.button1, 0, 0)
+        self.button_layout.addWidget(self.button2, 0, 1)
+        self.button_layout.addWidget(self.button3, 1, 0)
+        self.button_layout.addWidget(self.button4, 1, 1)
+        self.layout.addLayout(self.button_layout, 2, 0, 1, 2)
+
+        self.graph_window = pg.GraphicsLayoutWidget()
+        self.layout.addWidget(self.graph_window, 0, 2, 2, 1)
+
+        self.setLayout(self.layout)
+
+    def showGraph1(self):
+        self.graph_window.clear()
+        plot = self.graph_window.addPlot()
+        plot.plot(x=self.x_float, y=self.y, pen=(255, 0, 0))
+
+    def showGraph2(self):
+        self.graph_window.clear()
+        plot = self.graph_window.addPlot()
+        plot.setLabel('bottom', 'X')
+        plot.setLabel('left', 'Y')
+        plot.plot(x=self.x_float, y=self.y ** 2, pen=(0, 0, 255))
+
+    def showGraph3(self):
+        self.graph_window.clear()
+        plot = self.graph_window.addPlot()
+        plot.setLabel('bottom', 'X')
+        plot.setLabel('left', 'Y')
+        plot.plot(x=self.x_float, y=self.y ** 3, pen=(0, 255, 0))
+
+    def showGraph4(self):
+        self.graph_window.clear()
+        plot = self.graph_window.addPlot()
+        plot.setLabel('bottom', 'X')
+        plot.setLabel('left', 'Y')
+        plot.plot(x=self.x_float, y=-self.y, pen=(255, 0, 255))
 
 
-if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    main_window = MainWindow()
-    main_window.show()
+if __name__ == '__main__':
+    asset = yfStock('GOOG')
+    app = QApplication([])
+    info_window = InfoWindow(asset)
+    info_window.show()
     sys.exit(app.exec_())

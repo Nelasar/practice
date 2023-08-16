@@ -3,10 +3,6 @@ from abc import ABC, abstractmethod
 
 class Priceable(ABC):
     @abstractmethod
-    def setPrice(self, p):
-        pass
-
-    @abstractmethod
     def getName(self):
         pass
 

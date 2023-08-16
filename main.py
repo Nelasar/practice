@@ -1,6 +1,5 @@
 from PortfolioImpl import *
 import pandas as pd
-import yfinance as yf
 from technical_analysis import *
 from markovitz import *
 from yahoostock import *
@@ -10,132 +9,20 @@ from market import *
 from u import *
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView, QGridLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt5.QtGui import QColor
+from PyQt5.QtGui import QIntValidator
 from PyQt5 import uic
 from pyqtgraph import PlotWidget, plot, Qt
 import pyqtgraph as pg
 from pyqtgraph import DateAxisItem
 import sys
+from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow
+from linearregression import StockAnalysis
 
 mrkt = Market()
-mrkvz = MarkovitzAnalyzer()
+mrkvz = MarkowitzAnalyzer()
 portf = PortfolioImpl()
-
-'''
-class newWindow(QWidget):
-    def __init__(self, row_data):
-        super().__init__()
-        self.layout = QVBoxLayout()
-        self.tableWidget = QTableWidget()
-        self.tableWidget.setColumnCount(len(row_data))
-        self.tableWidget.setRowCount(1)
-        for col, data in enumerate(row_data):
-            self.tableWidget.setItem(0, col, QTableWidgetItem(data))
-
-        self.layout.addWidget(self.tableWidget)
-        self.setLayout(self.layout)
-'''
-
-
-class InfoWindow(QWidget):
-    def __init__(self, asset):
-        super().__init__()
-        self.layout = QGridLayout(self)
-        self.history = asset.getPriceHistory()
-
-        x = self.history.index
-        x = x.to_pydatetime().tolist()
-        y = self.history.values.flatten()
-        x_float = [date.timestamp() for date in x]
-
-        self.plot_widget = pg.PlotWidget(axisItems={'bottom': DateAxisItem()})
-        self.plot_widget.setLabel('bottom', 'X')
-        self.plot_widget.setLabel('left', 'Y')
-        self.layout.addWidget(self.plot_widget, 0, 0, 1, 1)
-
-        self.line_plot = pg.PlotCurveItem()
-        self.line_plot.setData(x=x_float, y=y, pen=(0, 255, 0))
-        self.plot_widget.addItem(self.line_plot)
-
-        table = QTableWidget(8, 2)
-        table.setHorizontalHeaderLabels(["Параметр", "Значение"])
-        self.layout.addWidget(table, 0, 1, 1, 1)
-
-        table.setItem(0, 0, QTableWidgetItem("Ticket"))
-        table.setItem(1, 0, QTableWidgetItem("Name"))
-        table.setItem(2, 0, QTableWidgetItem("Country"))
-        table.setItem(3, 0, QTableWidgetItem("Industry"))
-        table.setItem(4, 0, QTableWidgetItem("Price"))
-        table.setItem(5, 0, QTableWidgetItem("Beta"))
-        table.setItem(6, 0, QTableWidgetItem("Low"))
-        table.setItem(7, 0, QTableWidgetItem("High"))
-        table.setItem(8, 0, QTableWidgetItem("Open"))
-
-        headers = table.horizontalHeader()
-        headers.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
-
-        values = asset.getInfoValues()
-
-        index = 0
-        for key in values.keys():
-            table.setItem(index, 1, QTableWidgetItem(values[key]))
-            index += 1
-
-        self.text_label = QLabel()
-        # self.text_label.setText(values.keys()[0])
-        self.layout.addWidget(self.text_label, 1, 0, 1, 2)
-
-        self.setLayout(self.layout)
-
-
-class AnalysisWindow(QWidget):
-    def __init__(self,  anal_data, parent=None):
-        super().__init__(parent)
-        layout = QGridLayout(self)
-        x = anal_data[6][0, :].tolist()
-        y = anal_data[6][1, :].tolist()
-        z = [p['fun'] for p in anal_data[7]]
-        v = anal_data[8].tolist()
-        ind = anal_data[9].tolist()
-        width = anal_data[10]
-        ind2 = (anal_data[9] + width)
-        max_sharpe = anal_data[11]['x'].tolist()
-        min_vol = anal_data[12]['x'].tolist()
-
-        self.plot_widget = pg.PlotWidget()
-        self.plot_widget.setLabel('bottom', 'X')
-        self.plot_widget.setLabel('left', 'Y')
-        layout.addWidget(self.plot_widget, 0, 0, 1, 1)
-
-        self.scatter_plot = pg.ScatterPlotItem()
-        self.scatter_plot.setData(x, y,
-                                  pen=None, symbol='o', symbolSize=5, symbolBrush=(255, 0, 0))
-        self.plot_widget.addItem(self.scatter_plot)
-
-        self.line_plot = pg.PlotDataItem()
-        self.line_plot.setData(z, v, pen=(0, 255, 0))
-        self.plot_widget.addItem(self.line_plot)
-
-        self.bar_view = pg.PlotWidget()
-        self.bar_graph = pg.BarGraphItem(x=ind, height=max_sharpe, width=width, brush=(255, 0, 0))
-        self.bar_graph2 = pg.BarGraphItem(x=ind2, height=min_vol, width=width, brush=(0, 255, 0))
-        self.bar_view.addItem(self.bar_graph)
-        self.bar_view.addItem(self.bar_graph2)
-        layout.addWidget(self.bar_view, 0, 1, 1, 1)
-
-        table = QTableWidget(6, 2)
-        table.setHorizontalHeaderLabels(["Параметр", "Значение"])
-        layout.addWidget(table, 1, 0, 1, 2)
-        table.setItem(0, 0, QTableWidgetItem("Годовая доходность(макс. Шарп)"))
-        table.setItem(1, 0, QTableWidgetItem("Годовой риск(макс Шарп)"))
-        table.setItem(2, 0, QTableWidgetItem("Коэффициент Шарпа"))
-        table.setItem(3, 0, QTableWidgetItem("Годовая доходность(мин. риск)"))
-        table.setItem(4, 0, QTableWidgetItem("Годовой риск(мин. риск)"))
-        table.setItem(5, 0, QTableWidgetItem("Коэффициент Шарпа(мин. риск)"))
-
-        for i in range(0, 6):
-            table.setItem(i, 1, QTableWidgetItem(str(anal_data[i])))
-
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -143,8 +30,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.btnMarket.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_1))
         self.btnPortfolio.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_2))
-        self.rmvBtnMarket.clicked.connect
 
+        # ТАБЛИЦА РЫНКА
         header = self.tableMarket.horizontalHeader()
         header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
         self.tableMarket.setColumnWidth(1, 315)
@@ -152,12 +39,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
         self.tableMarket.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
+        # ТАБЛИЦА ПОРТФЕЛЯ
+        header = self.tablePortfolio.horizontalHeader()
+        header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        self.tablePortfolio.setColumnWidth(1, 315)
+        self.tablePortfolio.setColumnWidth(2, 250)
+        header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+        self.tablePortfolio.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
         self.addBtnMarket.setEnabled(False)
-        self.rmvBtnMarket.setEnabled(False)
+        self.removeButton.setEnabled(False)
+        self.addBtnPortf.setEnabled(False)
+
         self.description_window = QWidget()
         self.markovitz_window = QWidget()
         self.information_window = QWidget()
+        self.buy_window = QWidget()
 
+        # ЗАПОЛНЕНИЕ ТАБЛИЦЫ РЫНКА
         count = 0
         for asset in mrkt.allAssets():
             print(asset.getTicket(), asset.getName())
@@ -170,42 +70,71 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.tableMarket.setItem(count, 3, QTableWidgetItem(asset_info['price']))
             count += 1
 
+        '''
+        # ЗАПОЛНЕНИЕ ТАБЛИЦЫ ПОРТФЕЛЯ
+        #count = 0
+        for asset in portf.allSecuritiesByKey('Stock'):
+            print(asset.getTicket(), asset.getName())
+            row_pos = self.tablePortfolio.rowCount()
+            asset_info = asset.getInfoValues()
+            self.tablePortfolio.insertRow(row_pos)
+            self.tablePortfolio.setItem(count, 0, QTableWidgetItem(asset_info['ticket']))
+            self.tablePortfolio.setItem(count, 1, QTableWidgetItem(asset_info['name']))
+            self.tablePortfolio.setItem(count, 2, QTableWidgetItem(asset_info['industry']))
+            self.tablePortfolio.setItem(count, 3, QTableWidgetItem(asset_info['price']))
+            self.tablePortfolio.setItem((count, 4, QTableWidgetItem(asset.getQuantity())))
+            count += 1
+        '''
+
+        # КЛИКИ НА ТАБЛИЦЫ
         self.tableMarket.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableMarket.setSelectionMode(QAbstractItemView.SingleSelection)
 
-        self.tableAnalMarket.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.tableAnalMarket.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tablePortfolio.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tablePortfolio.setSelectionMode(QAbstractItemView.SingleSelection)
 
+        self.tableAnalysis.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableAnalysis.setSelectionMode(QAbstractItemView.SingleSelection)
+
+        # ФУНКЦИИ ПОВЕДЕНИЯ
+        # ДВОЙНОЕ НАЖАТИЕ НА РЫНКЕ
         def cell_double_clicked(item):
             security = mrkt.getAsset(self.tableMarket.item(item.row(), 0).text())
             info_window(security)
-            #row_data = [self.tableWidget.item(item.row(), col).text() for col in range(self.tableWidget.columnCount())]
-            #new_window(row_data)
+            # row_data = [self.tableWidget.item(item.row(), col).text() for col in range(self.tableWidget.columnCount())]
+            # new_window(row_data)
 
+        # НАЖАТИЕ НА РЫНКЕ
         def cell_clicked(item):
             ticket = str(self.tableMarket.item(item.row(), 0).text())
             if mrkvz.checkTicket(ticket):
                 self.addBtnMarket.setEnabled(False)
+                self.addBtnPortf.setEnabled(False)
             else:
                 self.addBtnMarket.setEnabled(True)
+                self.addBtnPortf.setEnabled(True)
             self.coords = item.row()
-            self.rmvBtnMarket.setEnabled(False)
+            self.removeButton.setEnabled(False)
 
-        def anal_cell_clicked(item):
+        # ВЫБРАН ЭЛЕМЕНТ ТАБЛИЦЫ МАРКОВИЦА
+        def analysis_cell_clicked(item):
             self.addBtnMarket.setEnabled(False)
-            self.rmvBtnMarket.setEnabled(True)
-            currentRow = self.tableAnalMarket.currentRow()
-            ticket = str(self.tableAnalMarket.item(currentRow, 0).text())
+            self.addBtnPortf.setEnabled(False)
+            self.removeButton.setEnabled(True)
+            currentRow = self.tableAnalysis.currentRow()
+            ticket = str(self.tableAnalysis.item(currentRow, 0).text())
             print(currentRow, ticket)
 
-        def market_rmv_button_clicked():
-            currentRow = self.tableAnalMarket.currentRow()
-            ticket = str(self.tableAnalMarket.item(currentRow, 0).text())
+        # УДАЛИТЬ ИЗ ТАБЛИЦЫ МАРКОВИЦА
+        def remove_button_clicked():
+            currentRow = self.tableAnalysis.currentRow()
+            ticket = str(self.tableAnalysis.item(currentRow, 0).text())
             print(currentRow, ticket)
-            self.tableAnalMarket.removeRow(currentRow)
+            self.tableAnalysis.removeRow(currentRow)
             mrkvz.removeAsset(ticket)
-            self.rmvBtnMarket.setEnabled(False)
+            self.removeButton.setEnabled(False)
 
+        # ДОБАВИТЬ В ТАБЛИЦУ МАРКОВИЦА С РЫНКА
         def market_add_button_clicked():
             st = str(self.tableMarket.item(self.coords, 0).text())
             if mrkvz.check(st):
@@ -213,17 +142,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 return
             else:
                 mrkvz.addAsset(mrkt.getAsset(st))
-                row_position = self.tableAnalMarket.rowCount()
-                self.tableAnalMarket.insertRow(row_position)
-                self.tableAnalMarket.setItem(row_position, 0, QTableWidgetItem(st))
+                row_position = self.tableAnalysis.rowCount()
+                self.tableAnalysis.insertRow(row_position)
+                self.tableAnalysis.setItem(row_position, 0, QTableWidgetItem(st))
                 self.addBtnMarket.setEnabled(False)
                 print(type(mrkt.getAsset(self.tableMarket.item(self.coords, 0).text())))
                 print("ASSETS: ", mrkvz.getAssetsCount())
 
+        # НАЖАТА КНОПКА АНАЛИЗ
         def analysis_button_clicked():
             analysis_data = mrkvz.perform_analysis()
             new_analysis_window(analysis_data)
 
+        # ОТКРЫТИЕ ОКНА АНАЛИЗА
         def new_analysis_window(analysis_data):
             self.markovitz_window = AnalysisWindow(analysis_data)
             self.markovitz_window.show()
@@ -236,20 +167,52 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             currentRow = self.tableMarket.currentRow()
             ticket = str(self.tableMarket.item(currentRow, 0).text())
             asset = mrkt.getAsset(ticket)
-            # print(ticket)
-            # print(mrkt.getAsset(ticket))
-            # print(asset.getTicket())
-            portf.addSecurity(asset)
-            portf.printSecurities()
 
+            self.buy_window = BuyWindow()
+            self.buy_window.show()
+            if self.buy_window.exec_() == QDialog.Accepted:
+                input_value = self.buy_window.get_input_value()
+                if input_value is not None:
+                    portf.addSecurityWithQuantity(asset, input_value)
+                    a_info = asset.getInfoValues()
+                    portfolio_row = self.tablePortfolio.rowCount()
+                    self.tablePortfolio.insertRow(portfolio_row)
+                    self.tablePortfolio.setItem(portfolio_row, 0, QTableWidgetItem(a_info['ticket']))
+                    self.tablePortfolio.setItem(portfolio_row, 1, QTableWidgetItem(a_info['name']))
+                    self.tablePortfolio.setItem(portfolio_row, 2, QTableWidgetItem(a_info['industry']))
+                    self.tablePortfolio.setItem(portfolio_row, 3, QTableWidgetItem(a_info['price']))
+                    self.tablePortfolio.setItem(portfolio_row, 4, QTableWidgetItem(str(asset.getQuantity())))
 
+        def portfolio_cell_double_clicked(item):
+            security = portf.getStock(self.tablePortfolio.item(item.row(), 0).text())
+            info_window(security)
+
+        def add_button_clicked_portfolio():
+            pass
+
+        def sell_button_clicked():
+            pass
+
+        def info_window_portfolio(security):
+            pass
+
+        # ПОВЕДЕНИЕ ОБЩИХ ЭЛЕМЕНТОВ
+        self.tableAnalysis.itemClicked.connect(analysis_cell_clicked)
+        self.removeButton.clicked.connect(remove_button_clicked)
+
+        # ПОВЕДЕНИЕ ТАБЛИЦЫ РЫНКА
         self.tableMarket.itemClicked.connect(cell_clicked)
         self.tableMarket.itemDoubleClicked.connect(cell_double_clicked)
-        self.tableAnalMarket.itemClicked.connect(anal_cell_clicked)
         self.addBtnMarket.clicked.connect(market_add_button_clicked)
         self.analBtnMarket.clicked.connect(analysis_button_clicked)
-        self.rmvBtnMarket.clicked.connect(market_rmv_button_clicked)
         self.btnBuy.clicked.connect(buy_button_clicked)
+
+        # ПОВЕДЕНИЕ ТАБЛИЦЫ ПОРТФЕЛЯ
+        self.tablePortfolio.itemClicked.connect(cell_clicked)
+        self.tablePortfolio.itemDoubleClicked.connect(portfolio_cell_double_clicked)
+        self.analBtnPortf.clicked.connect(analysis_button_clicked)
+        self.addBtnPortf.clicked.connect(add_button_clicked_portfolio)
+        self.sellBtnPortf.clicked.connect(sell_button_clicked)
 
 if __name__ == "__main__":
     # ЗДЕСЬ ТЕСТЫ ПО ТА, МОЖЕШЬ НА ЭТОТ КОД ХУЙ ЗАБИТЬ И ЗАКОММЕНТИТЬ ПОКА

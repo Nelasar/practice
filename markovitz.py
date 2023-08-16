@@ -5,10 +5,11 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 plt.rc('axes', axisbelow=True)
-class MarkovitzAnalyzer:
+class MarkowitzAnalyzer:
     def __init__(self):
         self.tickets = []
         self.assets = pd.DataFrame()
+
         self.num_portfolios = 10000
         self.risk_free_rate = 0.0
         self.num_periods_annually = 252
@@ -20,12 +21,6 @@ class MarkovitzAnalyzer:
         self.mean_returns = pd.DataFrame()
         self.cov_matrix = pd.DataFrame()
 
-        #self.year_income_max_sharpe = 0
-        #self.year_risk_max_sharpe = 0
-        #self.sharpe_ratio = 0
-        #self.year_income_min_risk = 0
-        #self.year_risk_min_risk = 0
-        #self.min_sharpe = 0
     def getAssetsCount(self):
         return len(self.tickets)
 

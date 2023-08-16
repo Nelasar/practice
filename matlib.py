@@ -3,7 +3,6 @@ import math
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-import yfinance as yf
 import ta
 
 r = 0.04
