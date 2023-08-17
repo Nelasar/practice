@@ -209,9 +209,7 @@ class MarkowitzAnalyzer:
         # plt.xlim(0.02, 0.03)
         # plt.ylim(-0.0002, 0.0011)
 
-        plt.tight_layout();
-        plt.show()
-
+        plt.tight_layout()
 
         return [round(rp, 3), round(sdp, 3),
                 round((rp - self.risk_free_rate) / sdp, 3), round(rp_min, 3),
