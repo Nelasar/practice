@@ -157,7 +157,6 @@ class MarkowitzAnalyzer:
         min_vol = self.min_variance(self.mean_returns, self.cov_matrix)
 
         sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
-
         max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
         max_sharpe_allocation.allocation = [round(i * 100, 2) for i in max_sharpe_allocation.allocation]
         max_sharpe_allocation = max_sharpe_allocation.T
@@ -173,61 +172,12 @@ class MarkowitzAnalyzer:
         results, _ = self.random_portfolios(
             self.num_portfolios, self.mean_returns, self.cov_matrix, self.risk_free_rate, self.tickets)
 
-
-        print("-" * 80)
-        print("Распределение долей акций в портфеле с максимальным коэффициентом Шарпа:\n")
-        print("Годовая доходность:", round(rp, 3))
-        #self.year_income_max_sharpe = round(rp, 3)
-        print("Годовой риск:", round(sdp, 3))
-        #self.year_risk_max_sharpe = round(sdp, 3)
-        print("Коэффициент Шарпа:", round((rp - self.risk_free_rate) / sdp, 3))
-        #self.sharpe_ratio = round((rp - self.risk_free_rate) / sdp, 3)
-        print(max_sharpe_allocation)
-        print("-" * 80)
-        print("Распределение долей акций в портфеле с наименьшим показателем риска:\n")
-        print("Годовая доходность:", round(rp_min, 3))
-        #self.year_income_min_risk = round(rp_min, 3)
-        print("Годовой риск:", round(sdp_min, 3))
-        #self.year_risk_min_risk = round(sdp_min, 3)
-        print("Коэффициент Шарпа:", round((rp_min - self.risk_free_rate) / sdp_min, 3))
-        #self.min_sharpe = round((rp_min - self.risk_free_rate) / sdp_min, 3)
-        print(min_vol_allocation)
-
         ind = np.arange(self.assets.columns.size)
         width = 0.35
 
-        '''
-        max_sharpe = self.max_sharp_ratio(self.mean_returns, self.cov_matrix, self.risk_free_rate)
-        sdp, rp = self.portfolio_annualised_performance(max_sharpe['x'], self.mean_returns, self.cov_matrix)
-        max_sharpe_allocation = pd.DataFrame(max_sharpe.x.copy(), index=self.assets.columns, columns=['allocation'])
-        max_sharpe_allocation.allocation = [round(i * 100, 2) for i in max_sharpe_allocation.allocation]
-        max_sharpe_allocation = max_sharpe_allocation.T
-
-        min_vol = self.min_variance(self.mean_returns, self.cov_matrix)
-        sdp_min, rp_min = self.portfolio_annualised_performance(min_vol['x'], self.mean_returns, self.cov_matrix)
-        min_vol_allocation = pd.DataFrame(min_vol.x.copy(), index=self.assets.columns, columns=['allocation'])
-        min_vol_allocation.allocation = [round(i * 100, 2) for i in min_vol_allocation.allocation]
-        min_vol_allocation = min_vol_allocation.T
 
         an_vol = np.std(self.returns) * np.sqrt(self.num_periods_annually)
         an_rt = self.mean_returns * self.num_periods_annually
-
-        target = np.linspace(rp_min, 0.00081, 20)
-        efficient_portfolios = self.efficient_frontier(self.mean_returns, self.cov_matrix, target)
-
-        print("-" * 80)
-        print("Распределение долей акций в портфеле с максимальным коэффициентом Шарпа\n")
-        print("Годовая доходность:", round(rp, 2))
-        print("Годовой риск:", round(sdp, 2))
-        print("Коэффициент Шарпа:", round((rp - self.risk_free_rate) / sdp, 3))
-        print(max_sharpe_allocation)
-        print("-" * 80)
-        print("Распределение долей акций в портфеле с наименьшим показателем риска:\n")
-        print("Годовая доходность:", round(rp_min, 2))
-        print("Годовой риск:", round(sdp_min, 2))
-        print("Коэффициент Шарпа:", round((rp_min - self.risk_free_rate) / sdp_min, 3))
-        print(min_vol_allocation)
-        print("-" * 80)
 
         print("Показатели доходности и риска каждой отдельной акции:\n")
         for i, txt in enumerate(self.assets.columns):
@@ -239,8 +189,7 @@ class MarkowitzAnalyzer:
         for i, txt in enumerate(self.assets.columns):
             plt.annotate(txt, (an_vol[i], an_rt[i]), xytext=(10, 0), textcoords='offset points')
 
-        # coolwarm RdBu YlGnBu
-        plt.scatter(results[0, :], results[1, :], c=results[2, :], cmap=cm.YlGnBu, marker='o', s=10, alpha=0.3)
+        plt.scatter(results[0, :], results[1, :], c=results[2, :], marker='o', s=10, alpha=0.3)
         plt.colorbar(label='Коэффициент Шарпа')
 
         plt.scatter(sdp, rp, marker='s', color='r', s=150, label='Максимальный коэф-т Шарпа')
@@ -250,6 +199,7 @@ class MarkowitzAnalyzer:
 
         plt.plot([p['fun'] for p in efficient_portfolios], target, 'k-x', linewidth=2,
                  label='граница эффективности')
+                 
         plt.title('Оптимизация портфеля и показатели отдельный акций')
         plt.xlabel('Риск (стандартное отклонение)')
         plt.ylabel('Доходность')
@@ -261,12 +211,12 @@ class MarkowitzAnalyzer:
 
         plt.tight_layout();
         plt.show()
-        
-        '''
+
 
         return [round(rp, 3), round(sdp, 3),
                 round((rp - self.risk_free_rate) / sdp, 3), round(rp_min, 3),
                 round(sdp_min, 3), round((rp_min - self.risk_free_rate) / sdp_min, 3),
                 results, efficient_portfolios, target,
                 ind, width,
-                max_sharpe, min_vol]
+                max_sharpe, min_vol, self.getAssetsCount(), self.tickets,
+                min_vol_allocation, max_sharpe_allocation]

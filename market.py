@@ -5,8 +5,8 @@ from yahoostock import yfStock
 
 class Market:
     def __init__(self):
-        self.tickers = ('GOOG', 'MSFT', 'PYPL', 'QCOM', 'U')
-                        # 'SHOP', 'HOOD', 'TTOO', 'EVGO', 'WIX',
+        self.tickers = ('GOOG', 'MSFT', 'PYPL', 'EVGO', 'U')
+                        # 'SHOP', 'HOOD', 'TTOO', 'QCOM', 'WIX',
                         # 'HAS',  'SAVE', 'MRNA', 'ETSY', 'MELI',
                         # 'RR.L', 'AMZN', 'DRVN', 'RAD',  'AAPL',
                         # 'FSLY', 'OXY',  'BUD',  'DASH', 'UPWK') # ДО СЮДА РАБОТАЕТ

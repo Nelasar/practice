@@ -62,20 +62,11 @@ class yfStock(Priceable):
     def getQuantity(self):
         return self.quantity
 
-
     def changeQuantity(self, change):
         self.quantity += change
-
 
     def getPriceHistory(self):
         return self.price_history
 
     def getType(self):
         return self.type
-
-
-google = yf.Ticker('GOOG').history(period='max')
-print(google.columns)
-
-goog = yf.download('GOOG')
-print(goog.columns)

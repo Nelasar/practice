@@ -12,6 +12,11 @@ class PortfolioImpl:
                 print(security, security.getQuantity())
             print()
 
+    def checkTicket(self, ticket):
+        if ticket in self.tickets:
+            return True
+        else:
+            return False
     def allSecuritiesByKey(self, key):
         return self.securities[key]
 
@@ -37,7 +42,7 @@ class PortfolioImpl:
         else:
             print("There is no such storage in portfolio!")
 
-    def addSecurityWithQuantity(self, security, quantity):
+    def buySecurity(self, security, quantity):
         security_type = security.getType()
         if security_type in self.securities:
             sec_copy = security
@@ -77,12 +82,19 @@ class PortfolioImpl:
         for securities_list in self.securities.values():
             for security in securities_list:
                 overall_price += security.getPrice() * security.getQuantity()
-        print("Overall price:", overall_price)
         return overall_price
+
+    def sellSecurity(self, ticket, change):
+        for asset in self.securities['Stock']:
+            if asset.getTicket() == ticket:
+                if change > asset.getQuantity() or change == asset.getQuantity():
+                    self.removeSecurity(asset)
+                    self.tickets.remove(ticket)
+                    self.printSecurities()
+                else:
+                    asset.changeQuantity(-change)
+                    self.printSecurities()
+
 
     def getSecurities(self):
         return self.securities
-
-    #@staticmethod
-    #def new_instance():
-    #    return PortfolioImpl()

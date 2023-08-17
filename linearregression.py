@@ -31,6 +31,7 @@ class StockAnalysis:
 
     def msd(self, first_period, second_period, save=None):
         df_copy = self.history.copy()
+        df_copy['returns'] = df_copy['close'].pct_change(1)
 
         first_index = 'MSD ' + str(first_period)
         second_index = 'MSD ' + str(second_period)
@@ -58,6 +59,7 @@ class StockAnalysis:
         fourth_index = 'MSD ' + str(msd_second_period)
 
         self.indexies = [first_index, second_index, third_index, fourth_index]
+        print(self.indexies)
 
         # create SMAs
         df_copy[first_index] = df_copy[['close']].rolling(sma_first_period).mean().shift(1)
@@ -90,6 +92,10 @@ class StockAnalysis:
         # create predictions for the whole dataset
         X = np.concatenate((X_train, X_test), axis=0)
         df["prediction"] = linear.predict(X)
+        # compute the position
+        df['position'] = np.sign(df['prediction'])
+        # compute the returns
+        df['strategy'] = df['returns'] * df['position'].shift(1)
 
         return df
 

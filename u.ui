@@ -311,6 +311,19 @@
           <set>Qt::AlignCenter</set>
          </property>
         </widget>
+        <widget class="QPushButton" name="portfolioInfoButton">
+         <property name="geometry">
+          <rect>
+           <x>810</x>
+           <y>350</y>
+           <width>151</width>
+           <height>81</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>О ПОРТФЕЛЕ</string>
+         </property>
+        </widget>
        </widget>
       </widget>
      </item>
