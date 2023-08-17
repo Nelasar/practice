@@ -88,6 +88,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableAnalysis.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.tableAnalysis.setSelectionMode(QAbstractItemView.SingleSelection)
 
+        self.tableAnalysis.setSizeAdjustPolicy(
+            QtWidgets.QAbstractScrollArea.AdjustToContents)
+
+        self.tableAnalysis.resizeColumnsToContents()
+
         # ФУНКЦИИ ПОВЕДЕНИЯ
         # ДВОЙНОЕ НАЖАТИЕ НА РЫНКЕ
         def cell_double_clicked(item):

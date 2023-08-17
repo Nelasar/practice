@@ -16,8 +16,6 @@ class StockAnalysis:
 
         self.indexies = []
 
-        print(self.history)
-
     def sma(self, first_period, second_period, save=None):
         df_copy = self.history.copy()
 
@@ -59,7 +57,6 @@ class StockAnalysis:
         fourth_index = 'MSD ' + str(msd_second_period)
 
         self.indexies = [first_index, second_index, third_index, fourth_index]
-        print(self.indexies)
 
         # create SMAs
         df_copy[first_index] = df_copy[['close']].rolling(sma_first_period).mean().shift(1)

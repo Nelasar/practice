@@ -6,7 +6,7 @@ import matplotlib.cm as cm
 
 plt.rc('axes', axisbelow=True)
 class MarkowitzAnalyzer:
-    def __init__(self):
+    def __init__(self, num_portfolios=10000, risk_free_rate=0.0, num_periods_annually=252):
         self.tickets = []
         self.assets = pd.DataFrame()
 
@@ -65,7 +65,8 @@ class MarkowitzAnalyzer:
         self.start = start
         self.end = end
 
-    def setup(self):
+    def setup(self): #, change_period=False):
+        #if change_period:
         self.assets = self.assets.dropna()
         self.returns = self.assets.pct_change()
         self.mean_returns = self.returns.mean()
@@ -148,7 +149,7 @@ class MarkowitzAnalyzer:
 
         return results, weights_record
 
-    def perform_analysis(self):
+    def perform_analysis(self, ):
         if len(self.tickets) == 0:
             return
 
@@ -175,46 +176,24 @@ class MarkowitzAnalyzer:
         ind = np.arange(self.assets.columns.size)
         width = 0.35
 
-
-        an_vol = np.std(self.returns) * np.sqrt(self.num_periods_annually)
-        an_rt = self.mean_returns * self.num_periods_annually
-
-        print("Показатели доходности и риска каждой отдельной акции:\n")
-        for i, txt in enumerate(self.assets.columns):
-            print(txt, ":", "годовая доходность:", round(an_rt[i], 2), ", годовой риск:", round(an_vol[i], 2))
-        print("-" * 80)
-
-        plt.subplots(figsize=(10, 7))
-
-        for i, txt in enumerate(self.assets.columns):
-            plt.annotate(txt, (an_vol[i], an_rt[i]), xytext=(10, 0), textcoords='offset points')
-
-        plt.scatter(results[0, :], results[1, :], c=results[2, :], marker='o', s=10, alpha=0.3)
-        plt.colorbar(label='Коэффициент Шарпа')
-
-        plt.scatter(sdp, rp, marker='s', color='r', s=150, label='Максимальный коэф-т Шарпа')
-        plt.scatter(sdp_min, rp_min, marker='s', color='g', s=150, label='Минимальный риск')
-
-        plt.scatter(an_vol, an_rt, marker='o', s=200, c='blue', edgecolors='black')
-
-        plt.plot([p['fun'] for p in efficient_portfolios], target, 'k-x', linewidth=2,
-                 label='граница эффективности')
-                 
-        plt.title('Оптимизация портфеля и показатели отдельный акций')
-        plt.xlabel('Риск (стандартное отклонение)')
-        plt.ylabel('Доходность')
-        plt.legend(labelspacing=0.8)
-        plt.grid(True, linestyle='--')
-
-        # plt.xlim(0.02, 0.03)
-        # plt.ylim(-0.0002, 0.0011)
-
-        plt.tight_layout()
-
-        return [round(rp, 3), round(sdp, 3),
+        '''return [round(rp, 3), round(sdp, 3),
                 round((rp - self.risk_free_rate) / sdp, 3), round(rp_min, 3),
                 round(sdp_min, 3), round((rp_min - self.risk_free_rate) / sdp_min, 3),
                 results, efficient_portfolios, target,
                 ind, width,
                 max_sharpe, min_vol, self.getAssetsCount(), self.tickets,
-                min_vol_allocation, max_sharpe_allocation]
+                min_vol_allocation, max_sharpe_allocation]'''
+
+        return { 'year_profit_max_sharpe': round(rp, 3),
+                 'year_risk_max_sharpe': round(sdp, 3),
+                 'sharpe_max_sharpe': round((rp - self.risk_free_rate) / sdp, 3),
+                 'year_profit_min_vol': round(rp_min, 3),
+                 'year_risk_min_vol': round(sdp_min, 3),
+                 'sharpe_min_vol': round((rp_min - self.risk_free_rate) / sdp_min, 3), # 5
+                 'results': results, 'efficient_portfolios': efficient_portfolios,
+                 'target': target,
+                 'index': ind, 'width': width, 'max_sharpe': max_sharpe,
+                 'min_vol': min_vol, 'asset_count': self.getAssetsCount(),
+                 'tickets': self.tickets, 'min_vol_alloc': min_vol_allocation,
+                 'max_sharpe_alloc': max_sharpe_allocation
+                }
