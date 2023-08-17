@@ -123,9 +123,3 @@ class StockAnalysis:
     plt.show()
     '''
 
-# lin_reg_trading('GOOG')
-asset = yfStock('GOOG')
-stock = StockAnalysis(asset)
-
-result = stock.lin_reg_trading(10, 30, 15, 60)
-print(result)
