@@ -60,14 +60,14 @@ class LinearInputWindowExtended(LinearInputWindow):
         self.setWindowTitle("Расширенное окно")
         self.setGeometry(300, 300, 500, 200)
 
-        self.input_label_third = QLabel("Введите дни (10-365):", self)
+        self.input_label_third = QLabel("Введите дни MSD (10-365):", self)
         self.input_label_third.move(300, 50)
 
         self.input_textbox_3 = QLineEdit(self)
         self.input_textbox_3.setValidator(QIntValidator(10, 365))
         self.input_textbox_3.move(300, 80)
 
-        self.input_label_fourth = QLabel("Введите дни (10-365):", self)
+        self.input_label_fourth = QLabel("Введите дни MSD (10-365):", self)
         self.input_label_fourth.move(300, 110)
 
         self.input_textbox_4 = QLineEdit(self)
@@ -144,10 +144,10 @@ class InfoWindow(QWidget):
         self.button_layout = QGridLayout()
         self.button_layout.setSpacing(10)
 
-        self.button1 = QPushButton("Button 1")
-        self.button2 = QPushButton("Button 2")
-        self.button3 = QPushButton("Button 3")
-        self.button4 = QPushButton("Button 4")
+        self.button1 = QPushButton("SMA")
+        self.button2 = QPushButton("MSD")
+        self.button3 = QPushButton("RSI")
+        self.button4 = QPushButton("PREDICTION")
 
         self.button1.clicked.connect(self.showGraphSMA)
         self.button2.clicked.connect(self.showGraphMSD)
