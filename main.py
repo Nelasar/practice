@@ -30,6 +30,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent=parent)
         self.setupUi(self)
+        with open('SpyBot.qss', 'r') as f:
+            theme = f.read()
+
+        # Apply the theme to the entire application
+        self.setStyleSheet(theme)
         self.btnMarket.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_1))
         self.btnPortfolio.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_2))
 
@@ -142,7 +147,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     self.analBtnMarket.setEnabled(True)
                     self.analBtnPortf.setEnabled(True)
 
-        # НАЖАТА КНОПКА АНАЛИЗ
         def analysis_button_clicked():
             analysis_data = mrkvz.perform_analysis()
             new_analysis_window(analysis_data)
@@ -150,7 +154,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # ОТКРЫТИЕ ОКНА АНАЛИЗА
         def new_analysis_window(analysis_data):
             self.markovitz_window = AnalysisWindow(analysis_data)
+            # Load the theme from the file
+            with open('SpyBot.qss', 'r') as f:
+                theme = f.read()
+            
+            # Apply the theme to the new analysis window
+            self.markovitz_window.setStyleSheet(theme)
+            
+            # Show the new analysis window
             self.markovitz_window.show()
+
 
         def info_window(security):
             self.information_window = InfoWindow(security)
