@@ -1,5 +1,3 @@
-import numpy as np
-import yfinance as yf
 from yahoostock import yfStock
 
 

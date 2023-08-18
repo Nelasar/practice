@@ -1,22 +1,13 @@
-from PortfolioImpl import *
-import pandas as pd
-import yfinance as yf
-from markovitz import *
-from yahoostock import *
-from sklearn.linear_model import LinearRegression
-from vectorized import *
-from market import *
-from u import *
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView, QGridLayout
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel, QLineEdit, QPushButton, QMessageBox
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QGridLayout
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QMessageBox
+from PyQt5.QtGui import  QFont
 from PyQt5.QtGui import QIntValidator
 from PyQt5 import uic
 from pyqtgraph import PlotWidget, plot, Qt
 import pyqtgraph as pg
 from pyqtgraph import DateAxisItem
 import sys
+
 
 class SellWindow(QDialog):
     def __init__(self, parent=None):

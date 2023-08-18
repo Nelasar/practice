@@ -1,10 +1,5 @@
 from priceable import Priceable
-from matlib import *
 import yfinance as yf
-import numpy as np
-import pandas as pd
-from datetime import datetime
-import pandas_datareader as pdr
 
 
 class yfStock(Priceable):
@@ -70,3 +65,4 @@ class yfStock(Priceable):
 
     def getType(self):
         return self.type
+

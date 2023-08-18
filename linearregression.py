@@ -1,12 +1,7 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import warnings
-import yfinance as yf
 import ta
-from yahoostock import *
 from sklearn.linear_model import LinearRegression
-plt.style.use('default')
 warnings.filterwarnings("ignore")
 
 class StockAnalysis:
@@ -16,7 +11,7 @@ class StockAnalysis:
 
         self.indexies = []
 
-    def sma(self, first_period, second_period, save=None):
+    def sma(self, first_period, second_period):
         df_copy = self.history.copy()
 
         first_index = 'SMA ' + str(first_period)
@@ -27,7 +22,7 @@ class StockAnalysis:
 
         return df_copy
 
-    def msd(self, first_period, second_period, save=None):
+    def msd(self, first_period, second_period):
         df_copy = self.history.copy()
         df_copy['returns'] = df_copy['close'].pct_change(1)
 
@@ -36,6 +31,8 @@ class StockAnalysis:
 
         df_copy[first_index] = df_copy[['returns']].rolling(first_period).std().shift(1)
         df_copy[second_index] = df_copy[['returns']].rolling(second_period).std().shift(1)
+
+        print(df_copy.columns)
 
         return df_copy
 
@@ -89,34 +86,12 @@ class StockAnalysis:
         # create predictions for the whole dataset
         X = np.concatenate((X_train, X_test), axis=0)
         df["prediction"] = linear.predict(X)
+        print(df['prediction'])
         # compute the position
         df['position'] = np.sign(df['prediction'])
+        print(df['prediction'])
         # compute the returns
         df['strategy'] = df['returns'] * df['position'].shift(1)
 
         return df
-
-    '''
-    # verify that the algorithm does not predict only way (pos or neg)
-    print(df['prediction'])
-
-    plt.plot(df['prediction'], label='Predicted Values')
-    plt.xlabel('Date')
-    plt.ylabel('Values')
-    plt.title('Predicted Values ')
-    plt.legend()
-    plt.show()
-
-    # compute the position
-    df['position'] = np.sign(df['prediction'])
-    # compute the returns
-    df['strategy'] = df['returns'] * df['position'].shift(1)
-
-    plt.plot(df['strategy'].cumsum() * 100, label='strategy')
-    plt.xlabel('Date')
-    plt.ylabel('Values')
-    plt.title('Strategy Result')
-    plt.legend()
-    plt.show()
-    '''
 

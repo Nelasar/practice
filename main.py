@@ -1,22 +1,13 @@
 from PortfolioImpl import *
-import pandas as pd
 from markovitz import *
-from yahoostock import *
-from vectorized import *
 from market import *
 from u import *
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView, QGridLayout
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel, QLineEdit, QPushButton, QMessageBox
-from PyQt5.QtGui import QColor
-from PyQt5.QtGui import QIntValidator
-from PyQt5 import uic
-from pyqtgraph import PlotWidget, plot, Qt
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QAbstractItemView
+from PyQt5.QtWidgets import QDialog
 import pyqtgraph as pg
-from pyqtgraph import DateAxisItem
 import sys
 from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow
-from linearregression import StockAnalysis
 from PortfolioGUI import SellWindow, PortfolioInfoWindow
 
 pg.setConfigOption("background", "w")
@@ -26,14 +17,16 @@ mrkt = Market()
 mrkvz = MarkowitzAnalyzer()
 portf = PortfolioImpl()
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent=parent)
         self.setupUi(self)
+        self.setWindowTitle('BAUMANInvestPro')
+        self.resize(1144, 750)
         with open('SpyBot.qss', 'r') as f:
             theme = f.read()
 
-        # Apply the theme to the entire application
         self.setStyleSheet(theme)
         self.btnMarket.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_1))
         self.btnPortfolio.clicked.connect(lambda: self.stackedWidget.setCurrentWidget(self.page_2))
@@ -267,7 +260,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.portfolioInfoButton.clicked.connect(portfolio_info_clicked)
 
 if __name__ == "__main__":
-    # ВОТ ЭТОТ КОД МОЛОДЕЦ
     """
     tickets = ["GOOG", "AMD", "^GSPC", "TEVA"]  # start="date", end="date", interval="1mo"
     ticks = yf.download(tickets, start='2020-07-24', end='2023-07-24')

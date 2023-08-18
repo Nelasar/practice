@@ -95,6 +95,5 @@ class PortfolioImpl:
                     asset.changeQuantity(-change)
                     self.printSecurities()
 
-
     def getSecurities(self):
         return self.securities

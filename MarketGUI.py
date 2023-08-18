@@ -1,16 +1,6 @@
-from PortfolioImpl import *
-import pandas as pd
-import yfinance as yf
-from markovitz import *
-from yahoostock import *
-from sklearn.linear_model import LinearRegression
-from vectorized import *
-from market import *
-from u import *
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QVBoxLayout, QLabel, QAbstractItemView, QGridLayout
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
-from PyQt5.QtGui import QColor
+from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QGridLayout
+from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
 from PyQt5.QtGui import QIntValidator
 from PyQt5 import uic
 from pyqtgraph import PlotWidget, plot, Qt
@@ -252,12 +242,14 @@ class InfoWindow(QWidget):
             input_values = self.input_window.get_input_values()
             if input_values is not None:
                 msd = self.analyzer.msd(input_values[0], input_values[1])
+                print(input_values[0])
+                print(input_values[1])
                 x = msd.index
                 x = x.to_pydatetime().tolist()
 
                 indexies = msd.columns
 
-                y = msd[indexies[1]].values.flatten()
+                y = msd[indexies[2]].values.flatten()
                 x_float = [date.timestamp() for date in x]
 
                 plot = self.graph_window.addPlot(axisItems={'bottom': DateAxisItem()})
@@ -268,7 +260,7 @@ class InfoWindow(QWidget):
 
                 x = msd.index
                 x = x.to_pydatetime().tolist()
-                y = msd[indexies[2]].values.flatten()
+                y = msd[indexies[3]].values.flatten()
                 x_float = [date.timestamp() for date in x]
                 plot.plot(x=x_float, y=y, pen=(255, 0, 0), name=indexies[3])
 
@@ -331,10 +323,12 @@ class InfoWindow(QWidget):
 
 
 
+
 class AnalysisWindow(QWidget):
     def __init__(self,  analysis_data, parent=None):
         super().__init__(parent)
         layout = QGridLayout(self)
+        self.setWindowTitle('Результаты анализа')
         self.resize(1000, 800)
         x = analysis_data['results'][0, :].tolist()
         y = analysis_data['results'][1, :].tolist()
@@ -370,8 +364,9 @@ class AnalysisWindow(QWidget):
         self.plot_widget.addItem(self.line_plot)
 
         self.bar_view = pg.PlotWidget()
-        self.bar_graph = pg.BarGraphItem(x=ind, height=max_sharpe, width=width, brush=(255, 0, 0))
-        self.bar_graph2 = pg.BarGraphItem(x=ind2, height=min_vol, width=width, brush=(0, 255, 0))
+        self.bar_view.addLegend()
+        self.bar_graph = pg.BarGraphItem(x=ind, height=max_sharpe, width=width, brush=(255, 0, 0), name='Max Sharpe')
+        self.bar_graph2 = pg.BarGraphItem(x=ind2, height=min_vol, width=width, brush=(0, 255, 0), name='Min Volatility')
         self.bar_view.addItem(self.bar_graph)
         self.bar_view.addItem(self.bar_graph2)
         layout.addWidget(self.bar_view, 0, 1, 1, 1)
