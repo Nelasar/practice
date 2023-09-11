@@ -42,7 +42,7 @@ class LinearInputWindow(QDialog):
         second_days = self.input_textbox_2.text()
 
         if int(first_days) == int(second_days):
-            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
         elif first_days.isnumeric() and second_days.isnumeric():
             return [int(first_days), int(second_days)]
@@ -80,13 +80,13 @@ class LinearInputWindowExtended(LinearInputWindow):
         fourth_days = self.input_textbox_4.text()
 
         if int(first_days) == int(second_days):
-            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
         elif int(third_days) == fourth_days(int):
-            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
         elif int(first_days) == int(fourth_days):
-            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
         elif first_days.isnumeric() and second_days.isnumeric() and third_days.isnumeric() and fourth_days.isnumeric():
             return [int(first_days), int(second_days), int(third_days), int(fourth_days)]
