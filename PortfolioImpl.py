@@ -41,6 +41,8 @@ class PortfolioImpl:
             self.securities[security_type].append(sec_copy)
         else:
             print("There is no such storage in portfolio!")
+            print("Creating. . .")
+            self.addNewSecurityStorage(security_type)
 
     def buySecurity(self, security, quantity):
         security_type = security.getType()
@@ -59,6 +61,8 @@ class PortfolioImpl:
                 return
         else:
             print("There is no such storage in portfolio!")
+            print("Creating. . . ")
+            self.addNewSecurityStorage(security_type)
 
     def removeSecurity(self, security):
         self.securities['Stock'].remove(security)

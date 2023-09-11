@@ -9,6 +9,8 @@ import pyqtgraph as pg
 import sys
 from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow
 from PortfolioGUI import SellWindow, PortfolioInfoWindow
+import yfinance as yf
+
 
 pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
@@ -17,6 +19,11 @@ mrkt = Market()
 mrkvz = MarkowitzAnalyzer()
 portf = PortfolioImpl()
 
+mrkt.addAsset(bond1)
+mrkt.addAsset(bond2)
+mrkt.addAsset(bond3)
+mrkt.addAsset(bond4)
+mrkt.addAsset(bond5)
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -38,6 +45,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableMarket.setColumnWidth(2, 250)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
         self.tableMarket.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        self.tableMarket.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
         # ТАБЛИЦА ПОРТФЕЛЯ
         header = self.tablePortfolio.horizontalHeader()
@@ -46,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tablePortfolio.setColumnWidth(2, 250)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
+        self.tablePortfolio.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tablePortfolio.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
         self.addBtnMarket.setEnabled(False)
@@ -65,10 +74,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             row_pos = self.tableMarket.rowCount()
             asset_info = asset.getInfoValues()
             self.tableMarket.insertRow(row_pos)
-            self.tableMarket.setItem(count, 0, QTableWidgetItem(asset_info['ticket']))
-            self.tableMarket.setItem(count, 1, QTableWidgetItem(asset_info['name']))
-            self.tableMarket.setItem(count, 2, QTableWidgetItem(asset_info['industry']))
-            self.tableMarket.setItem(count, 3, QTableWidgetItem(asset_info['price']))
+            self.tableMarket.setItem(count, 0, QTableWidgetItem(asset_info['Ticket']))
+            self.tableMarket.setItem(count, 1, QTableWidgetItem(asset_info['Name']))
+            self.tableMarket.setItem(count, 2, QTableWidgetItem(asset_info['Industry']))
+            self.tableMarket.setItem(count, 3, QTableWidgetItem(asset_info['Price']))
             count += 1
 
         # КЛИКИ НА ТАБЛИЦЫ
@@ -155,10 +164,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # Load the theme from the file
             with open('SpyBot.qss', 'r') as f:
                 theme = f.read()
-            
+
             # Apply the theme to the new analysis window
             self.markovitz_window.setStyleSheet(theme)
-            
+
             # Show the new analysis window
             self.markovitz_window.show()
 
@@ -188,10 +197,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         a_info = asset.getInfoValues()
                         portfolio_row = self.tablePortfolio.rowCount()
                         self.tablePortfolio.insertRow(portfolio_row)
-                        self.tablePortfolio.setItem(portfolio_row, 0, QTableWidgetItem(a_info['ticket']))
-                        self.tablePortfolio.setItem(portfolio_row, 1, QTableWidgetItem(a_info['name']))
-                        self.tablePortfolio.setItem(portfolio_row, 2, QTableWidgetItem(a_info['industry']))
-                        self.tablePortfolio.setItem(portfolio_row, 3, QTableWidgetItem(a_info['price']))
+                        self.tablePortfolio.setItem(portfolio_row, 0, QTableWidgetItem(a_info['Ticket']))
+                        self.tablePortfolio.setItem(portfolio_row, 1, QTableWidgetItem(a_info['Name']))
+                        self.tablePortfolio.setItem(portfolio_row, 2, QTableWidgetItem(a_info['Industry']))
+                        self.tablePortfolio.setItem(portfolio_row, 3, QTableWidgetItem(a_info['Price']))
                         self.tablePortfolio.setItem(portfolio_row, 4, QTableWidgetItem(str(asset.getQuantity())))
         # ДВОЙНОЕ НАЖАТИЕ НА АКЦИЮ В ПОРТФЕЛЕ
         def portfolio_cell_double_clicked(item):
@@ -259,16 +268,77 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.analBtnPortf.setEnabled(False)
         self.portfolioInfoButton.clicked.connect(portfolio_info_clicked)
 
+
 if __name__ == "__main__":
-    """
-    tickets = ["GOOG", "AMD", "^GSPC", "TEVA"]  # start="date", end="date", interval="1mo"
-    ticks = yf.download(tickets, start='2020-07-24', end='2023-07-24')
-    ticks = ticks[["Adj Close"]]
-    """
-
     app = QtWidgets.QApplication(sys.argv)
-
     window = Ui_MainWindow()  # uic.loadUi('u.ui')
     MainWindow = MainWindow()
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+#
+#
+# BONDS/STOCKS TABLES
+#
+#
+
+"""
+import sys
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QVBoxLayout
+from functools import partial
+
+def create_menu(menu, tables):
+    securities = ['Stocks', 'Bonds', 'Metals']
+    for i, security in enumerate(securities):
+        show_table_func = partial(show_table, i, tables)
+        action = menu.addAction(security)
+        action.setIconVisibleInMenu(False)
+        action.triggered.connect(show_table_func)
+
+def show_table(security_index, tables):
+    for i, table in enumerate(tables):
+        table.setVisible(i == security_index)
+
+class Widget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.tables = []
+        menu = QtWidgets.QMenu(self)
+        create_menu(menu, self.tables)
+
+        button = QtWidgets.QPushButton()
+        button.setMenu(menu)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(button)
+
+        self.create_table("Stocks")
+        self.create_table("Bonds")
+        self.create_table("Metals")
+
+        self.setLayout(self.layout)
+        self.resize(640, 480)
+
+    def create_table(self, security):
+        table = QTableWidget()
+        table.setColumnCount(1)
+        table.setHorizontalHeaderLabels([security])
+        for i in range(5):
+            item = QTableWidgetItem(f"{security} Item {i + 1}")
+            table.setItem(i, 0, item)
+        table.setVisible(security == "Stocks")
+        self.tables.append(table)
+        self.layout.addWidget(table)
+
+if __name__ == "__main__":
+    # app = QtWidgets.QApplication(sys.argv)
+    # w = Widget()
+    # w.show()
+    # sys.exit(app.exec_())
+    pass
+
+    # ticket = yf.Ticker('^TNX')
+
+"""

@@ -15,33 +15,39 @@ class LinearInputWindow(QDialog):
         super().__init__(parent)
 
         self.setWindowTitle("Анализ акции")
-        self.setGeometry(300, 300, 300, 200)
+        self.setGeometry(300, 300, 300, 325)
+        self.setFixedSize(300, 325)
 
         self.input_label_first = QLabel("Введите дни (10-365):", self)
         self.input_label_first.move(50, 50)
 
         self.input_textbox = QLineEdit(self)
-        self.input_textbox.setValidator(QIntValidator(10, 365))  # Исправленная строка
+        self.input_textbox.setValidator(QIntValidator(10, 365))
         self.input_textbox.move(50, 80)
 
         self.input_label_second = QLabel("Введите дни (10-365):", self)
         self.input_label_second.move(50, 110)
 
         self.input_textbox_2 = QLineEdit(self)
-        self.input_textbox_2.setValidator(QIntValidator(10, 365))  # Исправленная строка
+        self.input_textbox_2.setValidator(QIntValidator(10, 365))
         self.input_textbox_2.move(50, 150)
 
         self.ok_button = QPushButton("ОК", self)
         self.ok_button.move(50, 200)
         self.ok_button.clicked.connect(self.accept)
 
+
     def get_input_values(self):
         first_days = self.input_textbox.text()
         second_days = self.input_textbox_2.text()
-        if first_days.isnumeric() and second_days.isnumeric():
+
+        if int(first_days) == int(second_days):
+            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif first_days.isnumeric() and second_days.isnumeric():
             return [int(first_days), int(second_days)]
         else:
-            QMessageBox.warning(self, "Ошибка", "Неправильный ввод. Введите число заново.")
+            QMessageBox.warning(self, "Ошибка!", "Неправильный ввод. Введите число заново.")
             return None
 
 class LinearInputWindowExtended(LinearInputWindow):
@@ -49,6 +55,7 @@ class LinearInputWindowExtended(LinearInputWindow):
         super().__init__(parent)
         self.setWindowTitle("Анализ акции")
         self.setGeometry(300, 300, 500, 200)
+        self.setFixedSize(500, 250)
 
         self.input_label_third = QLabel("Введите дни MSD (10-365):", self)
         self.input_label_third.move(300, 50)
@@ -72,7 +79,16 @@ class LinearInputWindowExtended(LinearInputWindow):
         third_days = self.input_textbox_3.text()
         fourth_days = self.input_textbox_4.text()
 
-        if first_days.isnumeric() and second_days.isnumeric() and third_days.isnumeric() and fourth_days.isnumeric():
+        if int(first_days) == int(second_days):
+            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif int(third_days) == fourth_days(int):
+            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif int(first_days) == int(fourth_days):
+            QMessageBox.message(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif first_days.isnumeric() and second_days.isnumeric() and third_days.isnumeric() and fourth_days.isnumeric():
             return [int(first_days), int(second_days), int(third_days), int(fourth_days)]
         else:
             QMessageBox.warning(self, "Ошибка", "Неправильный ввод. Введите число заново.")
@@ -87,6 +103,7 @@ class InfoWindow(QWidget):
         self.history = asset.getPriceHistory()
 
         self.resize(1600, 750)
+        self.setFixedSize(1600, 750)
 
         self.analyzer = StockAnalysis(asset)
 
@@ -110,6 +127,7 @@ class InfoWindow(QWidget):
 
         self.table = QTableWidget(9, 2)
         self.table.resize(650, 800)
+        self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.table.setHorizontalHeaderLabels(["Параметр", "Значение"])
         self.layout.addWidget(self.table, 0, 1, 1, 1)
 
@@ -118,6 +136,17 @@ class InfoWindow(QWidget):
 
         self.table.resizeColumnsToContents()
 
+        # IF ASSET.GETTYPE == 'Stock' ELIF ASSET.GETTYPE == 'Bond'
+        values = asset.getInfoValues()
+
+        print(values)
+
+        index = 0
+        for key in values.keys():
+            self.table.setItem(index, 0, QTableWidgetItem(str(key)))
+            index += 1
+
+        """
         self.table.setItem(0, 0, QTableWidgetItem("Ticket"))
         self.table.setItem(1, 0, QTableWidgetItem("Name"))
         self.table.setItem(2, 0, QTableWidgetItem("Country"))
@@ -127,16 +156,15 @@ class InfoWindow(QWidget):
         self.table.setItem(6, 0, QTableWidgetItem("Low"))
         self.table.setItem(7, 0, QTableWidgetItem("High"))
         self.table.setItem(8, 0, QTableWidgetItem("Open"))
-
+        """
         headers = self.table.horizontalHeader()
         headers.setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
 
-        values = asset.getInfoValues()
-
         index = 0
         for key in values.keys():
-            self.table.setItem(index, 1, QTableWidgetItem(values[key]))
+            self.table.setItem(index, 1, QTableWidgetItem(str(values[key])))
             index += 1
+
 
         self.text_label = QLabel()
         self.layout.addWidget(self.text_label, 1, 0, 1, 2)
@@ -306,12 +334,12 @@ class InfoWindow(QWidget):
                 y = linear_trading['prediction'].values.flatten()
                 x_float = [date.timestamp() for date in x]
 
-                '''
+                # HERE
                 plot = self.graph_window.addPlot(axisItems={'bottom': DateAxisItem()})
                 plot.setLabel('bottom', 'X')
                 plot.setLabel('left', 'Y')
                 plot.plot(x=x_float, y=y, pen=(0, 0, 255), name='Prediction')
-                '''
+
                 plot.addLegend()
 
                 x = linear_trading.index
@@ -321,15 +349,14 @@ class InfoWindow(QWidget):
                 plot.plot(x=x_float, y=y, pen=(255, 0, 0), name='Strategy')
 
 
-
-
-
 class AnalysisWindow(QWidget):
     def __init__(self,  analysis_data, parent=None):
         super().__init__(parent)
         layout = QGridLayout(self)
         self.setWindowTitle('Результаты анализа')
         self.resize(1000, 800)
+        self.setFixedSize(1000, 800)
+
         x = analysis_data['results'][0, :].tolist()
         y = analysis_data['results'][1, :].tolist()
         z = [p['fun'] for p in analysis_data['efficient_portfolios']]
@@ -375,6 +402,7 @@ class AnalysisWindow(QWidget):
         table.setHorizontalHeaderLabels(["Параметр", "Значение"])
         layout.addWidget(table, 1, 0, 1, 2)
         table.resize(650, 800)
+        table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         table.setItem(0, 0, QTableWidgetItem("Годовая доходность(макс. Шарп)"))
         table.setItem(1, 0, QTableWidgetItem("Годовой риск(макс Шарп)"))
         table.setItem(2, 0, QTableWidgetItem("Коэффициент Шарпа"))
@@ -409,12 +437,13 @@ class BuyWindow(QDialog):
 
         self.setWindowTitle("Новое окно")
         self.setGeometry(300, 300, 300, 200)
+        self.setFixedSize(300, 200)
 
         self.input_label = QLabel("Введите количество (0-10000):", self)
         self.input_label.move(50, 50)
 
         self.input_textbox = QLineEdit(self)
-        self.input_textbox.setValidator(QIntValidator(0, 10000))  # Исправленная строка
+        self.input_textbox.setValidator(QIntValidator(0, 10000))
         self.input_textbox.move(50, 80)
 
         self.ok_button = QPushButton("ОК", self)

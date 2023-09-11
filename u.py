@@ -15,6 +15,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1144, 750)
+        MainWindow.setFixedSize(1144, 725)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.btnMarket = QtWidgets.QPushButton(self.centralwidget)
@@ -67,11 +68,13 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_1)
         self.page_2 = QtWidgets.QWidget()
         self.page_2.setObjectName("page_2")
+
         self.tablePortfolio = QtWidgets.QTableWidget(self.page_2)
         self.tablePortfolio.setGeometry(QtCore.QRect(0, 40, 791, 531))
         self.tablePortfolio.setObjectName("tablePortfolio")
         self.tablePortfolio.setColumnCount(5)
         self.tablePortfolio.setRowCount(0)
+
         item = QtWidgets.QTableWidgetItem()
         self.tablePortfolio.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -81,34 +84,45 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.tablePortfolio.setHorizontalHeaderItem(3, item)
         item = QtWidgets.QTableWidgetItem()
+
         self.tablePortfolio.setHorizontalHeaderItem(4, item)
+
         self.addBtnPortf = QtWidgets.QPushButton(self.page_2)
         self.addBtnPortf.setGeometry(QtCore.QRect(840, 40, 91, 71))
         self.addBtnPortf.setObjectName("addBtnPortf")
+
         self.analBtnPortf = QtWidgets.QPushButton(self.page_2)
         self.analBtnPortf.setGeometry(QtCore.QRect(800, 120, 181, 51))
         self.analBtnPortf.setObjectName("analBtnPortf")
+
         self.sellBtnPortf = QtWidgets.QPushButton(self.page_2)
         self.sellBtnPortf.setGeometry(QtCore.QRect(800, 170, 181, 81))
         self.sellBtnPortf.setObjectName("sellBtnPortf")
+
         self.labelPortf = QtWidgets.QLabel(self.page_2)
         self.labelPortf.setGeometry(QtCore.QRect(0, 0, 331, 31))
         self.labelPortf.setAlignment(QtCore.Qt.AlignCenter)
         self.labelPortf.setObjectName("labelPortf")
+
         self.labelMarkovitz_2 = QtWidgets.QLabel(self.page_2)
         self.labelMarkovitz_2.setGeometry(QtCore.QRect(790, 10, 191, 31))
         self.labelMarkovitz_2.setAlignment(QtCore.Qt.AlignCenter)
         self.labelMarkovitz_2.setObjectName("labelMarkovitz_2")
+
         self.portfolioInfoButton = QtWidgets.QPushButton(self.page_2)
         self.portfolioInfoButton.setGeometry(QtCore.QRect(810, 350, 151, 81))
         self.portfolioInfoButton.setObjectName("portfolioInfoButton")
+
         self.stackedWidget.addWidget(self.page_2)
         self.verticalLayout.addWidget(self.stackedWidget)
+
         self.tableAnalysis = QtWidgets.QTableWidget(self.centralwidget)
         self.tableAnalysis.setGeometry(QtCore.QRect(1020, 80, 101, 191))
         self.tableAnalysis.setObjectName("tableAnalysis")
         self.tableAnalysis.setColumnCount(1)
         self.tableAnalysis.setRowCount(0)
+        self.tableAnalysis.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+
         item = QtWidgets.QTableWidgetItem()
         self.tableAnalysis.setHorizontalHeaderItem(0, item)
         self.removeButton = QtWidgets.QPushButton(self.centralwidget)
@@ -131,6 +145,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.btnMarket.setText(_translate("MainWindow", "РЫНОК"))
         self.btnPortfolio.setText(_translate("MainWindow", "ПОРТФЕЛЬ"))
+
         item = self.tableMarket.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "ТИКЕР"))
         item = self.tableMarket.horizontalHeaderItem(1)
@@ -139,12 +154,14 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "ОТРАСЛЬ"))
         item = self.tableMarket.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "ЦЕНА"))
+
         self.labelMarket.setText(_translate("MainWindow", "РЫНОК"))
         self.btnBuy.setText(_translate("MainWindow", "КУПИТЬ"))
         self.addBtnMarket.setText(_translate("MainWindow", "ДОБАВИТЬ"))
         self.labelMarkovitzMarket.setText(_translate("MainWindow", "МАРКОВИЦ"))
         self.analBtnMarket.setText(_translate("MainWindow", "АНАЛИЗ"))
         item = self.tablePortfolio.horizontalHeaderItem(0)
+
         item.setText(_translate("MainWindow", "ТИКЕР"))
         item = self.tablePortfolio.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "НАЗВАНИЕ"))
@@ -154,12 +171,14 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "ЦЕНА"))
         item = self.tablePortfolio.horizontalHeaderItem(4)
         item.setText(_translate("MainWindow", "КОЛИЧЕСТВО"))
+
         self.addBtnPortf.setText(_translate("MainWindow", "ДОБАВИТЬ"))
         self.analBtnPortf.setText(_translate("MainWindow", "АНАЛИЗ"))
         self.sellBtnPortf.setText(_translate("MainWindow", "ПРОДАТЬ"))
         self.labelPortf.setText(_translate("MainWindow", "ПОРТФЕЛЬ"))
         self.labelMarkovitz_2.setText(_translate("MainWindow", "МАРКОВИЦ"))
         self.portfolioInfoButton.setText(_translate("MainWindow", "О ПОРТФЕЛЕ"))
+
         item = self.tableAnalysis.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "ТИКЕР"))
         self.removeButton.setText(_translate("MainWindow", "УБРАТЬ"))

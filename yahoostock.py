@@ -7,6 +7,7 @@ class yfStock(Priceable):
         self.type = "Stock"
         self.ticket = ticket
         self.name = yf.Ticker(ticket).info['shortName']
+        self.long_name = yf.Ticker(ticket).info['longName']
         self.country = str(yf.Ticker(ticket).info['country'])
         self.industry = str(yf.Ticker(ticket).info['industry'])
 
@@ -22,15 +23,16 @@ class yfStock(Priceable):
 
         self.quantity = 0
 
-        self.info = {'ticket':   self.ticket,
-                     'name':     self.name,
-                     'country':  self.country,
-                     'industry': self.industry,
-                     'price':    str(self.price),
-                     'beta':     self.beta,
-                     'low':      self.low,
-                     'high':     self.high,
-                     'open':     self.open}
+        self.info = {'Ticket':   self.ticket,
+                     'Name':     self.name,
+                     'FullName': self.long_name,
+                     'Country':  self.country,
+                     'Industry': self.industry,
+                     'Price':    str(self.price),
+                     'Beta':     self.beta,
+                     'Low':      self.low,
+                     'High':     self.high,
+                     'Open':     self.open}
 
     def __str__(self):
         return f"Information:\nTicker: {self.ticket}\n" \
@@ -65,4 +67,3 @@ class yfStock(Priceable):
 
     def getType(self):
         return self.type
-

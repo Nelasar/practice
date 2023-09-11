@@ -1,9 +1,10 @@
 from yahoostock import yfStock
+from bond import *
 
 
 class Market:
     def __init__(self):
-        self.tickers = ('GOOG', 'MSFT', 'PYPL', 'EVGO', 'U')
+        self.tickers = ('GOOG', 'MSFT', 'PYPL', 'EVGO', 'U', 'GAZP.ME')
                         # 'SHOP', 'HOOD', 'TTOO', 'QCOM', 'WIX',
                         # 'HAS',  'SAVE', 'MRNA', 'ETSY', 'MELI',
                         # 'RR.L', 'AMZN', 'DRVN', 'RAD',  'AAPL',
@@ -13,6 +14,10 @@ class Market:
                         #'ROCK', 'FTDR', 'NKLA', 'NVDA', 'INTC',
                         #'PAYC', 'GNRC', 'DNA',  'LFUS', 'EXAS')
         self.assets = {ticker: yfStock(ticker) for ticker in self.tickers}
+
+    def addAsset(self, asset):
+        ticker = asset.getTicket()
+        self.assets[ticker] = asset
 
     def getAsset(self, symbol: str):
         return self.assets[symbol]
