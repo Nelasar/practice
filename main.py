@@ -44,7 +44,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tableMarket.setColumnWidth(1, 315)
         self.tableMarket.setColumnWidth(2, 250)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-        self.tableMarket.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
         self.tableMarket.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
         # ТАБЛИЦА ПОРТФЕЛЯ
@@ -54,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.tablePortfolio.setColumnWidth(2, 250)
         header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
         header.setSectionResizeMode(4, QtWidgets.QHeaderView.ResizeToContents)
-        self.tablePortfolio.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        header.setSectionResizeMode(5, QtWidgets.QHeaderView.ResizeToContents)
         self.tablePortfolio.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
 
         self.addBtnMarket.setEnabled(False)
@@ -73,11 +73,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         for asset in mrkt.allAssets():
             row_pos = self.tableMarket.rowCount()
             asset_info = asset.getInfoValues()
+            asset_type = asset.getType()
             self.tableMarket.insertRow(row_pos)
             self.tableMarket.setItem(count, 0, QTableWidgetItem(asset_info['Ticket']))
             self.tableMarket.setItem(count, 1, QTableWidgetItem(asset_info['Name']))
             self.tableMarket.setItem(count, 2, QTableWidgetItem(asset_info['Industry']))
             self.tableMarket.setItem(count, 3, QTableWidgetItem(asset_info['Price']))
+            self.tableMarket.setItem(count, 4, QTableWidgetItem(asset_type))
             count += 1
 
         # КЛИКИ НА ТАБЛИЦЫ
@@ -165,10 +167,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             with open('SpyBot.qss', 'r') as f:
                 theme = f.read()
 
-            # Apply the theme to the new analysis window
             self.markovitz_window.setStyleSheet(theme)
-
-            # Show the new analysis window
             self.markovitz_window.show()
 
 
@@ -202,23 +201,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         self.tablePortfolio.setItem(portfolio_row, 2, QTableWidgetItem(a_info['Industry']))
                         self.tablePortfolio.setItem(portfolio_row, 3, QTableWidgetItem(a_info['Price']))
                         self.tablePortfolio.setItem(portfolio_row, 4, QTableWidgetItem(str(asset.getQuantity())))
+                        self.tablePortfolio.setItem(portfolio_row, 5, QTableWidgetItem(str(asset.getType())))
         # ДВОЙНОЕ НАЖАТИЕ НА АКЦИЮ В ПОРТФЕЛЕ
         def portfolio_cell_double_clicked(item):
-            security = portf.getStock(self.tablePortfolio.item(item.row(), 0).text())
+            security = portf.getStock(self.tablePortfolio.item(item.row(), 0).text(),
+                                      self.tablePortfolio.item(item.row(), 5).text())
             info_window(security)
         # ДОБАВЛЕНИЕ В АНАЛИЗАТОР МАРКОВИЦА ИЗ ПОРТФЕЛЯ
         def add_button_clicked_portfolio():
             st = str(self.tablePortfolio.item(self.tablePortfolio.currentRow(), 0).text())
+            type = str(self.tablePortfolio.item(self.tablePortfolio.currentRow(), 5). text())
             if mrkvz.check(st):
                 print("IN!!!")
                 return
             else:
-                mrkvz.addAsset(portf.getStock(st))
+                mrkvz.addAsset(portf.getStock(st, type))
                 row_position = self.tableAnalysis.rowCount()
                 self.tableAnalysis.insertRow(row_position)
                 self.tableAnalysis.setItem(row_position, 0, QTableWidgetItem(st))
                 self.addBtnMarket.setEnabled(False)
-                print(type(mrkt.getAsset(self.tablePortfolio.item(self.tablePortfolio.currentRow(), 0).text())))
+                #print(type(mrkt.getAsset(self.tablePortfolio.item(self.tablePortfolio.currentRow(), 0).text())))
                 print("ASSETS: ", mrkvz.getAssetsCount())
 
                 if mrkvz.getAssetsCount() >= 2:
@@ -228,7 +230,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         def sell_button_clicked():
             currentRow = self.tablePortfolio.currentRow()
             ticket = str(self.tablePortfolio.item(currentRow, 0).text())
-            asset = portf.getStock(ticket)
+            type = str(self.tablePortfolio.item(currentRow, 5).text())
+            asset = portf.getStock(ticket, type)
 
             self.sell_window = SellWindow()
             self.sell_window.show()
@@ -236,7 +239,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.sell_window.exec_() == QDialog.Accepted:
                 change = self.sell_window.get_input_value()
                 if change is not None:
-                    portf.sellSecurity(ticket, change)
+                    portf.sellSecurity(ticket, type, change)
                     portfolio_row = self.tablePortfolio.currentRow()
                     if portf.checkTicket(ticket):
                         self.tablePortfolio.setItem(portfolio_row, 4, QTableWidgetItem(str(asset.getQuantity())))

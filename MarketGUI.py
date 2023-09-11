@@ -125,7 +125,7 @@ class InfoWindow(QWidget):
         self.text_label.setText('ИСТОРИЯ ЦЕН')
         self.layout.addWidget(self.text_label, 1, 0, 1, 2)
 
-        self.table = QTableWidget(9, 2)
+        self.table = QTableWidget(10, 2)
         self.table.resize(650, 800)
         self.table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.table.setHorizontalHeaderLabels(["Параметр", "Значение"])

@@ -36,20 +36,26 @@ class PortfolioImpl:
 
     def addSecurity(self, security):
         security_type = security.getType()
-        if security_type in self.securities:
-            sec_copy = security
-            self.securities[security_type].append(sec_copy)
-        else:
+        if security_type not in self.securities:
             print("There is no such storage in portfolio!")
             print("Creating. . .")
             self.addNewSecurityStorage(security_type)
 
+        if security_type in self.securities:
+            sec_copy = security
+            self.securities[security_type].append(sec_copy)
+
     def buySecurity(self, security, quantity):
         security_type = security.getType()
+        if security_type not in self.securities:
+            print("There is no such storage in portfolio!")
+            print("Creating. . . ")
+            self.addNewSecurityStorage(security_type)
+
         if security_type in self.securities:
             sec_copy = security
             if sec_copy.getTicket() in self.tickets:
-                for asset in self.securities['Stock']:
+                for asset in self.securities[security_type]:
                     if sec_copy.getTicket() == asset.getTicket():
                         asset.changeQuantity(quantity)
                         self.printSecurities()
@@ -59,25 +65,24 @@ class PortfolioImpl:
                 self.tickets.append(sec_copy.getTicket())
                 self.securities[security_type].append(sec_copy)
                 return
-        else:
-            print("There is no such storage in portfolio!")
-            print("Creating. . . ")
-            self.addNewSecurityStorage(security_type)
+
 
     def removeSecurity(self, security):
-        self.securities['Stock'].remove(security)
+        type = security.getType()
+        self.securities[type].remove(security)
 
     def weighting(self):
         self.size = self.calculateSize()
         weights = {}
 
-        for asset in self.securities['Stock']:
-            weights[asset.getTicket()] = asset.getQuantity() / self.size * 100
-        print(self.size)
+        for key in self.securities.keys():
+            for asset in self.securities[key]:
+                weights[asset.getTicket()] = asset.getQuantity() / self.size * 100
+            print(self.size)
         return weights
 
-    def getStock(self, ticket):
-        for asset in self.securities['Stock']:
+    def getStock(self, ticket, type):
+        for asset in self.securities[type]:
             if asset.getTicket() == ticket:
                 return asset
 
@@ -88,8 +93,8 @@ class PortfolioImpl:
                 overall_price += security.getPrice() * security.getQuantity()
         return overall_price
 
-    def sellSecurity(self, ticket, change):
-        for asset in self.securities['Stock']:
+    def sellSecurity(self, ticket, type, change):
+        for asset in self.securities[type]:
             if asset.getTicket() == ticket:
                 if change > asset.getQuantity() or change == asset.getQuantity():
                     self.removeSecurity(asset)
