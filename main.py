@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QTableWidgetItem, QWidget, QAbstractItemView
 from PyQt5.QtWidgets import QDialog
 import pyqtgraph as pg
 import sys
-from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow
+from MarketGUI import BuyWindow, InfoWindow, AnalysisWindow, SetupAnalyzerWindow
 from PortfolioGUI import SellWindow, PortfolioInfoWindow
 import yfinance as yf
 
@@ -16,7 +16,7 @@ pg.setConfigOption("background", "w")
 pg.setConfigOption("foreground", "k")
 
 mrkt = Market()
-mrkvz = MarkowitzAnalyzer()
+mrkvz = MarkowitzAnalyzer(5000, 10.0)
 portf = PortfolioImpl()
 
 mrkt.addAsset(bond1)
@@ -25,12 +25,13 @@ mrkt.addAsset(bond3)
 mrkt.addAsset(bond4)
 mrkt.addAsset(bond5)
 
+
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         QtWidgets.QMainWindow.__init__(self, parent=parent)
         self.setupUi(self)
         self.setWindowTitle('BAUMANInvestPro')
-        self.resize(1144, 750)
+        self.resize(1200, 750)
         with open('SpyBot.qss', 'r') as f:
             theme = f.read()
 
@@ -60,6 +61,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.addBtnMarket.setEnabled(False)
         self.removeButton.setEnabled(False)
         self.addBtnPortf.setEnabled(False)
+        self.clearButton.setEnabled(False)
 
         self.description_window = QWidget()
         self.markovitz_window = QWidget()
@@ -67,6 +69,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.buy_window = QWidget()
         self.sell_window = QWidget()
         self.portfolio_info_window = QWidget()
+        self.setup_analyzer_window = QWidget()
 
         # ЗАПОЛНЕНИЕ ТАБЛИЦЫ РЫНКА
         count = 0
@@ -117,6 +120,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.coords = item.row()
             self.removeButton.setEnabled(False)
 
+
         # ВЫБРАН ЭЛЕМЕНТ ТАБЛИЦЫ МАРКОВИЦА
         def analysis_cell_clicked(item):
             self.addBtnMarket.setEnabled(False)
@@ -136,6 +140,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if mrkvz.getAssetsCount() == 0:
                 self.analBtnMarket.setEnabled(False)
                 self.analBtnPortf.setEnabled(False)
+                self.clearButton.setEnabled(False)
+
+        def clear_button_clicked():
+            while(self.tableAnalysis.rowCount() > 0):
+                self.tableAnalysis.removeRow(0)
+            mrkvz.clearAnalyzer()
+            self.clearButton.setEnabled(False)
+            self.analBtnPortf.setEnabled(False)
+            self.analBtnMarket.setEnabled(False)
 
         # ДОБАВИТЬ В ТАБЛИЦУ МАРКОВИЦА С РЫНКА
         def market_add_button_clicked():
@@ -155,6 +168,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if mrkvz.getAssetsCount() >= 2:
                     self.analBtnMarket.setEnabled(True)
                     self.analBtnPortf.setEnabled(True)
+                if mrkvz.getAssetsCount() >= 1:
+                    self.clearButton.setEnabled(True)
 
         def analysis_button_clicked():
             analysis_data = mrkvz.perform_analysis()
@@ -170,6 +185,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.markovitz_window.setStyleSheet(theme)
             self.markovitz_window.show()
 
+        def setup_button_clicked():
+            self.setup_analyzer_window = SetupAnalyzerWindow()
+            self.setup_analyzer_window.show()
+
+            if self.setup_analyzer_window.exec_() == QDialog.Accepted:
+                input_values = self.setup_analyzer_window.get_input_values()
+                mrkvz.set_options(input_values[0], input_values[1])
 
         def info_window(security):
             self.information_window = InfoWindow(security)
@@ -220,12 +242,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.tableAnalysis.insertRow(row_position)
                 self.tableAnalysis.setItem(row_position, 0, QTableWidgetItem(st))
                 self.addBtnMarket.setEnabled(False)
-                #print(type(mrkt.getAsset(self.tablePortfolio.item(self.tablePortfolio.currentRow(), 0).text())))
                 print("ASSETS: ", mrkvz.getAssetsCount())
 
                 if mrkvz.getAssetsCount() >= 2:
                     self.analBtnMarket.setEnabled(True)
                     self.analBtnPortf.setEnabled(True)
+                    self.clearButton.setEnabled(True)
         # КНОПКА ПРОДАЖИ
         def sell_button_clicked():
             currentRow = self.tablePortfolio.currentRow()
@@ -253,6 +275,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # ПОВЕДЕНИЕ ОБЩИХ ЭЛЕМЕНТОВ
         self.tableAnalysis.itemClicked.connect(analysis_cell_clicked)
         self.removeButton.clicked.connect(remove_button_clicked)
+        self.clearButton.clicked.connect(clear_button_clicked)
+        self.setupAnalyzerBtn.clicked.connect(setup_button_clicked)
 
         # ПОВЕДЕНИЕ ТАБЛИЦЫ РЫНКА
         self.tableMarket.itemClicked.connect(cell_clicked)
@@ -278,6 +302,7 @@ if __name__ == "__main__":
     MainWindow = MainWindow()
     MainWindow.show()
     sys.exit(app.exec_())
+
 
 
 #

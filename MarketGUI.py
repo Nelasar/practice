@@ -1,13 +1,13 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QTableWidgetItem, QTableWidget, QWidget, QGridLayout
 from PyQt5.QtWidgets import QDialog, QLabel, QLineEdit, QPushButton, QMessageBox, QComboBox
-from PyQt5.QtGui import QIntValidator
-from PyQt5 import uic
-from pyqtgraph import PlotWidget, plot, Qt
+from PyQt5.QtGui import QIntValidator, QDoubleValidator
 import pyqtgraph as pg
 from pyqtgraph import DateAxisItem
-import sys
 from linearregression import StockAnalysis
+from PyQt5 import uic
+from pyqtgraph import PlotWidget, plot, Qt
+import sys
 
 
 class LinearInputWindow(QDialog):
@@ -43,6 +43,9 @@ class LinearInputWindow(QDialog):
 
         if int(first_days) == int(second_days):
             QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif first_days == None or second_days == None:
+            QMessageBox.warning(self, 'Ошибка!', 'Введите оба числа.')
             return None
         elif first_days.isnumeric() and second_days.isnumeric():
             return [int(first_days), int(second_days)]
@@ -82,11 +85,14 @@ class LinearInputWindowExtended(LinearInputWindow):
         if int(first_days) == int(second_days):
             QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
-        elif int(third_days) == fourth_days(int):
+        elif int(third_days) == int(fourth_days):
             QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
             return None
         elif int(first_days) == int(fourth_days):
             QMessageBox.warning(self, "Ошибка!", "Числа не должны быть равны.")
+            return None
+        elif first_days == None or second_days == None or third_days == None or fourth_days == None:
+            QMessageBox.warning(self, "Ошибка!", "Введите все числа.")
             return None
         elif first_days.isnumeric() and second_days.isnumeric() and third_days.isnumeric() and fourth_days.isnumeric():
             return [int(first_days), int(second_days), int(third_days), int(fourth_days)]
@@ -136,7 +142,6 @@ class InfoWindow(QWidget):
 
         self.table.resizeColumnsToContents()
 
-        # IF ASSET.GETTYPE == 'Stock' ELIF ASSET.GETTYPE == 'Bond'
         values = asset.getInfoValues()
 
         print(values)
@@ -367,8 +372,10 @@ class AnalysisWindow(QWidget):
         max_sharpe = analysis_data['max_sharpe']['x'].tolist()
         min_vol = analysis_data['min_vol']['x'].tolist()
         items = analysis_data['asset_count']
+
         print(type(items))
         tickets = analysis_data['tickets']
+
         allocation = analysis_data['min_vol_alloc']
         print(type(allocation))
         allocation = allocation.iloc[0]
@@ -457,3 +464,41 @@ class BuyWindow(QDialog):
         else:
             QMessageBox.warning(self, "Ошибка", "Неправильный ввод. Введите число заново.")
             return None
+
+
+class SetupAnalyzerWindow(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Настроить Анализатор")
+        self.setGeometry(300, 300, 400, 200)
+        self.setFixedSize(400, 200)
+
+        self.input_label = QLabel("Кол-во портфелей", self)
+        self.input_label.move(50, 50)
+
+        self.input_textbox = QLineEdit(self)
+        self.input_textbox.setValidator(QIntValidator(1000, 10000))
+        self.input_textbox.move(50, 80)
+
+        self.input_label_2 = QLabel("Риск", self)
+        self.input_label_2.move(250, 50)
+
+        self.input_textbox_2 = QLineEdit(self)
+        self.input_textbox_2.setValidator(QDoubleValidator(0.0, 100.0, 2))
+        self.input_textbox_2.move(250, 80)
+
+        self.ok_button = QPushButton("ОК", self)
+        self.ok_button.move(50, 120)
+        self.ok_button.clicked.connect(self.get_input_values)
+        self.ok_button.move(100, 120)
+
+    def get_input_values(self):
+        num_portfolio = self.input_textbox.text()
+        risk_rate = self.input_textbox_2.text()
+
+        if num_portfolio.isnumeric() and risk_rate.isnumeric():
+            return [int(num_portfolio), float(risk_rate)]
+        elif num_portfolio is None or risk_rate is None:
+            QMessageBox.warning(self, "Ошибка", "Неправильный ввод. Введите числа заново.")
+            return None
+

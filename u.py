@@ -14,28 +14,32 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1144, 750)
-        MainWindow.setFixedSize(1144, 725)
+        MainWindow.resize(1250, 750)
+        MainWindow.setFixedSize(1250, 700)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.btnMarket = QtWidgets.QPushButton(self.centralwidget)
         self.btnMarket.setGeometry(QtCore.QRect(10, 10, 141, 51))
         self.btnMarket.setObjectName("btnMarket")
         self.btnPortfolio = QtWidgets.QPushButton(self.centralwidget)
         self.btnPortfolio.setGeometry(QtCore.QRect(190, 10, 131, 51))
         self.btnPortfolio.setObjectName("btnPortfolio")
+
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 80, 1001, 601))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(10, 80, 1090, 600))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setObjectName("verticalLayout")
+
         self.stackedWidget = QtWidgets.QStackedWidget(self.verticalLayoutWidget)
         self.stackedWidget.setObjectName("stackedWidget")
         self.page_1 = QtWidgets.QWidget()
         self.page_1.setObjectName("page_1")
+
         self.tableMarket = QtWidgets.QTableWidget(self.page_1)
-        self.tableMarket.setGeometry(QtCore.QRect(0, 40, 791, 531))
+        self.tableMarket.setGeometry(QtCore.QRect(0, 40, 840    , 531))
         self.tableMarket.setObjectName("tableMarket")
         self.tableMarket.setColumnCount(5)
         self.tableMarket.setRowCount(0)
@@ -57,20 +61,20 @@ class Ui_MainWindow(object):
         self.labelMarket.setObjectName("labelMarket")
 
         self.btnBuy = QtWidgets.QPushButton(self.page_1)
-        self.btnBuy.setGeometry(QtCore.QRect(800, 170, 181, 81))
+        self.btnBuy.setGeometry(QtCore.QRect(850, 170, 181, 81))
         self.btnBuy.setObjectName("btnBuy")
 
         self.addBtnMarket = QtWidgets.QPushButton(self.page_1)
-        self.addBtnMarket.setGeometry(QtCore.QRect(840, 40, 91, 71))
+        self.addBtnMarket.setGeometry(QtCore.QRect(890, 40, 91, 71))
         self.addBtnMarket.setObjectName("addBtnMarket")
 
         self.labelMarkovitzMarket = QtWidgets.QLabel(self.page_1)
-        self.labelMarkovitzMarket.setGeometry(QtCore.QRect(790, 10, 191, 31))
+        self.labelMarkovitzMarket.setGeometry(QtCore.QRect(840, 10, 191, 31))
         self.labelMarkovitzMarket.setAlignment(QtCore.Qt.AlignCenter)
         self.labelMarkovitzMarket.setObjectName("labelMarkovitzMarket")
 
         self.analBtnMarket = QtWidgets.QPushButton(self.page_1)
-        self.analBtnMarket.setGeometry(QtCore.QRect(800, 120, 181, 51))
+        self.analBtnMarket.setGeometry(QtCore.QRect(850, 120, 181, 51))
         self.analBtnMarket.setObjectName("analBtnMarket")
         self.stackedWidget.addWidget(self.page_1)
 
@@ -78,7 +82,7 @@ class Ui_MainWindow(object):
         self.page_2.setObjectName("page_2")
 
         self.tablePortfolio = QtWidgets.QTableWidget(self.page_2)
-        self.tablePortfolio.setGeometry(QtCore.QRect(0, 40, 791, 531))
+        self.tablePortfolio.setGeometry(QtCore.QRect(0, 40, 840, 531))
         self.tablePortfolio.setObjectName("tablePortfolio")
         self.tablePortfolio.setColumnCount(6)
         self.tablePortfolio.setRowCount(0)
@@ -97,15 +101,15 @@ class Ui_MainWindow(object):
         self.tablePortfolio.setHorizontalHeaderItem(5, item)
 
         self.addBtnPortf = QtWidgets.QPushButton(self.page_2)
-        self.addBtnPortf.setGeometry(QtCore.QRect(840, 40, 91, 71))
+        self.addBtnPortf.setGeometry(QtCore.QRect(890, 40, 91, 71))
         self.addBtnPortf.setObjectName("addBtnPortf")
 
         self.analBtnPortf = QtWidgets.QPushButton(self.page_2)
-        self.analBtnPortf.setGeometry(QtCore.QRect(800, 120, 181, 51))
+        self.analBtnPortf.setGeometry(QtCore.QRect(850, 120, 181, 51))
         self.analBtnPortf.setObjectName("analBtnPortf")
 
         self.sellBtnPortf = QtWidgets.QPushButton(self.page_2)
-        self.sellBtnPortf.setGeometry(QtCore.QRect(800, 170, 181, 81))
+        self.sellBtnPortf.setGeometry(QtCore.QRect(850, 170, 181, 81))
         self.sellBtnPortf.setObjectName("sellBtnPortf")
 
         self.labelPortf = QtWidgets.QLabel(self.page_2)
@@ -114,19 +118,19 @@ class Ui_MainWindow(object):
         self.labelPortf.setObjectName("labelPortf")
 
         self.labelMarkovitz_2 = QtWidgets.QLabel(self.page_2)
-        self.labelMarkovitz_2.setGeometry(QtCore.QRect(790, 10, 191, 31))
+        self.labelMarkovitz_2.setGeometry(QtCore.QRect(840, 10, 191, 31))
         self.labelMarkovitz_2.setAlignment(QtCore.Qt.AlignCenter)
         self.labelMarkovitz_2.setObjectName("labelMarkovitz_2")
 
         self.portfolioInfoButton = QtWidgets.QPushButton(self.page_2)
-        self.portfolioInfoButton.setGeometry(QtCore.QRect(810, 350, 151, 81))
+        self.portfolioInfoButton.setGeometry(QtCore.QRect(870, 350, 151, 81))
         self.portfolioInfoButton.setObjectName("portfolioInfoButton")
 
         self.stackedWidget.addWidget(self.page_2)
         self.verticalLayout.addWidget(self.stackedWidget)
 
         self.tableAnalysis = QtWidgets.QTableWidget(self.centralwidget)
-        self.tableAnalysis.setGeometry(QtCore.QRect(1020, 80, 101, 191))
+        self.tableAnalysis.setGeometry(QtCore.QRect(1100, 80, 101, 191))
         self.tableAnalysis.setObjectName("tableAnalysis")
         self.tableAnalysis.setColumnCount(1)
         self.tableAnalysis.setRowCount(0)
@@ -134,9 +138,15 @@ class Ui_MainWindow(object):
 
         item = QtWidgets.QTableWidgetItem()
         self.tableAnalysis.setHorizontalHeaderItem(0, item)
+
         self.removeButton = QtWidgets.QPushButton(self.centralwidget)
-        self.removeButton.setGeometry(QtCore.QRect(1020, 280, 101, 71))
+        self.removeButton.setGeometry(QtCore.QRect(1100, 280, 101, 71))
         self.removeButton.setObjectName("removeButton")
+
+        self.clearButton = QtWidgets.QPushButton(self.centralwidget)
+        self.clearButton.setGeometry(QtCore.QRect(1100, 370, 101, 71))
+        self.clearButton.setObjectName("clearButton")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1144, 26))
@@ -195,3 +205,9 @@ class Ui_MainWindow(object):
         item = self.tableAnalysis.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "ТИКЕР"))
         self.removeButton.setText(_translate("MainWindow", "УБРАТЬ"))
+        self.clearButton.setText(_translate("MainWindow", "ОЧИСТКА"))
+
+        self.setupAnalyzerBtn = QtWidgets.QPushButton(self.centralwidget)
+        self.setupAnalyzerBtn.setGeometry(QtCore.QRect(1100, 471, 101, 71))
+        self.setupAnalyzerBtn.setObjectName("setupAnalyzerBtn")
+        self.setupAnalyzerBtn.setText(_translate("MainWindow", "НАСТРОЙКА"))

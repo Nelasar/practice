@@ -4,66 +4,66 @@ import yfinance as yf
 
 class yfStock(Priceable):
     def __init__(self, ticket):
-        self.type = "Stock"
-        self.ticket = ticket
-        self.name = yf.Ticker(ticket).info['shortName']
-        self.long_name = yf.Ticker(ticket).info['longName']
-        self.country = str(yf.Ticker(ticket).info['country'])
-        self.industry = str(yf.Ticker(ticket).info['industry'])
+        self.__type = "Stock"
+        self.__ticket = ticket
+        self.__name = yf.Ticker(ticket).info['shortName']
+        self.__long_name = yf.Ticker(ticket).info['longName']
+        self.__country = str(yf.Ticker(ticket).info['country'])
+        self.__industry = str(yf.Ticker(ticket).info['industry'])
 
-        self.price_history = yf.download(ticket)
-        self.price_history = self.price_history[["Adj Close"]]
-        self.price_history.columns = ["close"]
+        self.__price_history = yf.download(ticket)
+        self.__price_history = self.__price_history[["Adj Close"]]
+        self.__price_history.columns = ["close"]
 
-        self.price = yf.Ticker(ticket).info['currentPrice']
-        self.beta = str(yf.Ticker(ticket).info['beta'])
-        self.low = str(yf.Ticker(ticket).info['dayLow'])
-        self.high = str(yf.Ticker(ticket).info['dayHigh'])
-        self.open = str(yf.Ticker(ticket).info['open'])
+        self.__price = yf.Ticker(ticket).info['currentPrice']
+        self.__beta = str(yf.Ticker(ticket).info['beta'])
+        self.__low = str(yf.Ticker(ticket).info['dayLow'])
+        self.__high = str(yf.Ticker(ticket).info['dayHigh'])
+        self.__open = str(yf.Ticker(ticket).info['open'])
 
-        self.quantity = 0
+        self.__quantity = 0
 
-        self.info = {'Ticket':   self.ticket,
-                     'Name':     self.name,
-                     'FullName': self.long_name,
-                     'Country':  self.country,
-                     'Industry': self.industry,
-                     'Price':    str(self.price),
-                     'Beta':     self.beta,
-                     'Low':      self.low,
-                     'High':     self.high,
-                     'Open':     self.open}
+        self.__info = {'Ticket':   self.__ticket,
+                       'Name':     self.__name,
+                       'FullName': self.__long_name,
+                       'Country':  self.__country,
+                       'Industry': self.__industry,
+                       'Price':    str(self.__price),
+                       'Beta':     self.__beta,
+                       'Low':      self.__low,
+                       'High':     self.__high,
+                       'Open':     self.__open}
 
     def __str__(self):
-        return f"Information:\nTicker: {self.ticket}\n" \
-                f"Company Name: {self.name}\n" \
-                f"Country: {self.country}\n" \
-                f"Current Price: {self.price}\n" \
-                f"Industry: {self.industry}\n"
+        return f"Information:\nTicker: {self.__ticket}\n" \
+                f"Company Name: {self.__name}\n" \
+                f"Country: {self.__country}\n" \
+                f"Current Price: {self.__price}\n" \
+                f"Industry: {self.__industry}\n"
 
     def getInfoValues(self, key=None):
         if key is None:
-            return self.info
+            return self.__info
         else:
-            return self.info[key]
+            return self.__info[key]
 
     def getTicket(self):
-        return self.ticket
+        return self.__ticket
 
     def getName(self):
-        return self.name
+        return self.__name
 
     def getPrice(self):
-        return self.price
+        return self.__price
 
     def getQuantity(self):
-        return self.quantity
+        return self.__quantity
 
     def changeQuantity(self, change):
-        self.quantity += change
+        self.__quantity += change
 
     def getPriceHistory(self):
-        return self.price_history
+        return self.__price_history
 
     def getType(self):
-        return self.type
+        return self.__type

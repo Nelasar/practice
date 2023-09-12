@@ -6,13 +6,13 @@ warnings.filterwarnings("ignore")
 
 class StockAnalysis:
     def __init__(self, asset):
-        self.history = asset.getPriceHistory().copy()
-        self.history = self.history.dropna()
+        self.__history = asset.getPriceHistory().copy()
+        self.__history = self.__history.dropna()
 
-        self.indexies = []
+        self.__indexies = []
 
     def sma(self, first_period, second_period):
-        df_copy = self.history.copy()
+        df_copy = self.__history.copy()
 
         first_index = 'SMA ' + str(first_period)
         second_index = 'SMA ' + str(second_period)
@@ -23,7 +23,7 @@ class StockAnalysis:
         return df_copy
 
     def msd(self, first_period, second_period):
-        df_copy = self.history.copy()
+        df_copy = self.__history.copy()
         df_copy['returns'] = df_copy['close'].pct_change(1)
 
         first_index = 'MSD ' + str(first_period)
@@ -37,7 +37,7 @@ class StockAnalysis:
         return df_copy
 
     def RSI(self, save=None):
-        df_copy = self.history.copy()
+        df_copy = self.__history.copy()
         RSI = ta.momentum.RSIIndicator(df_copy['close'], window=14, fillna=False)
         df_copy['rsi'] = RSI.rsi()
 
@@ -45,7 +45,7 @@ class StockAnalysis:
 
     def feature_engineering(self, sma_first_period, sma_second_period,
                                   msd_first_period, msd_second_period):
-        df_copy = self.history.copy()
+        df_copy = self.__history.copy()
         df_copy['returns'] = df_copy['close'].pct_change(1)
 
         first_index = 'SMA ' + str(sma_first_period)
@@ -53,7 +53,7 @@ class StockAnalysis:
         third_index = 'MSD ' + str(msd_first_period)
         fourth_index = 'MSD ' + str(msd_second_period)
 
-        self.indexies = [first_index, second_index, third_index, fourth_index]
+        self.__indexies = [first_index, second_index, third_index, fourth_index]
 
         # create SMAs
         df_copy[first_index] = df_copy[['close']].rolling(sma_first_period).mean().shift(1)
