@@ -489,7 +489,7 @@ class SetupAnalyzerWindow(QDialog):
 
         self.ok_button = QPushButton("ОК", self)
         self.ok_button.move(50, 120)
-        self.ok_button.clicked.connect(self.get_input_values)
+        self.ok_button.clicked.connect(self.accept)
         self.ok_button.move(100, 120)
 
     def get_input_values(self):

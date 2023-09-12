@@ -192,6 +192,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             if self.setup_analyzer_window.exec_() == QDialog.Accepted:
                 input_values = self.setup_analyzer_window.get_input_values()
                 mrkvz.set_options(input_values[0], input_values[1])
+                print('Success')
 
         def info_window(security):
             self.information_window = InfoWindow(security)
